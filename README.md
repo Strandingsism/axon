@@ -37,83 +37,15 @@ dream / brainstorm ──→ write-plan ──→ implement / execute ──→ 
                               └────── verify ────┘
 ```
 
-## HUD
-
-Axon includes a read-only terminal HUD for workflow visibility:
-
-```bash
-axon              # start Codex and Axon HUD in mux panes
-axon setup        # install or upgrade the Axon Codex plugin
-axon codex        # same as axon; forwards extra args to codex
-axon hud          # render once
-axon hud --watch  # refresh every second
-axon hud --json   # print the raw HUD model
-axon hud attach   # open --watch in a tmux-compatible pane
-```
-
-The HUD reads only:
-
-- `.axon/state.json` — current recorded phase
-- `docs/tasks.json` — task list and completion state
-
-No state transition graph or event timeline is inferred.
-
-`axon` uses a platform-native mux layer: Windows uses PSMUX, while macOS and
-Linux use tmux. The default workspace is stacked vertically: Codex gets the top
-80% of the terminal, and `axon hud --watch` gets the bottom 20%.
-
-Install the mux first if needed:
-
-```bash
-winget install psmux   # Windows
-brew install tmux      # macOS
-sudo apt install tmux  # Ubuntu/Debian
-```
-
-`axon hud attach` uses the same mux layer. It opens a small read-only HUD pane
-for an already-running mux session.
-
-Axon does not auto-open panes from Codex `SessionStart`. Use `axon` when you want
-the two-pane Axon workspace; use `codex` when you want the plain Codex CLI.
-
-`axon setup` checks whether the Axon Codex plugin marketplace and plugin are
-installed. It installs missing pieces, upgrades stale installs to the CLI's
-bundled version, and exits cleanly when everything is already current.
-
-## Install
-
-Add the Axon marketplace, then install Axon from `/plugins`:
-
-```bash
-codex plugin marketplace add Strandingsism/axon
-```
-
-If you installed the Axon CLI through npm, run:
-
-```bash
-axon setup
-```
-
-For local development, add this checkout directly:
-
-```bash
-codex plugin marketplace add D:/Reaserch/Axon/axon
-```
-
 ## Directory Structure
 
 ```
 axon/
-├── .agents/plugins/marketplace.json
-├── package.json
-├── plugins/
-│   └── axon/        # Codex plugin payload
-│       ├── .codex-plugin/plugin.json
-│       ├── skills/  # 10 skill definitions (SKILL.md each)
-│       ├── hooks/
-│       ├── docs/
-│       └── templates/
-├── tdd/             # TDD tests for Axon itself
+├── skills/          # 10 skill definitions (SKILL.md each)
+├── docs/
+│   ├── specs/       # Design documents (brainstorm output)
+│   └── plans/       # Implementation plans (write-plan output)
+├── templates/       # AGENTS.md and other bootstrapping templates
 └── src/             # CLI implementation
 ```
 
