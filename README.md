@@ -37,14 +37,33 @@ dream / brainstorm ──→ write-plan ──→ implement / execute ──→ 
                               └────── verify ────┘
 ```
 
+## HUD
+
+Axon includes a read-only terminal HUD for workflow visibility:
+
+```bash
+axon hud          # render once
+axon hud --watch  # refresh every second
+axon hud --json   # print the raw HUD model
+```
+
+The HUD reads only:
+
+- `.axon/state.json` — current recorded phase
+- `docs/tasks.json` — task list and completion state
+
+No state transition graph or event timeline is inferred.
+
 ## Directory Structure
 
 ```
 axon/
+├── package.json
 ├── skills/          # 10 skill definitions (SKILL.md each)
 ├── docs/
 │   ├── specs/       # Design documents (brainstorm output)
 │   └── plans/       # Implementation plans (write-plan output)
+├── tdd/             # TDD tests for Axon itself
 ├── templates/       # AGENTS.md and other bootstrapping templates
 └── src/             # CLI implementation
 ```

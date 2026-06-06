@@ -1,0 +1,13 @@
+{
+  "name": "axon",
+  "version": "0.1.0",
+  "description": "Lean development methodology for AI coding agents",
+  "type": "module",
+  "bin": {
+    "axon": "src/cli/axon.mjs"
+  },
+  "scripts": {
+    "test": "node --test tdd/*.test.mjs"
+  },
+  "license": "MIT"
+}
