@@ -57,10 +57,25 @@ No state transition graph or event timeline is inferred.
 
 `axon hud attach` uses a tmux-compatible mux layer. On Windows it prefers `psmux`; on Unix-like systems it uses `tmux`, including cmux's tmux compatibility shim when present.
 
+## Install
+
+Add the Axon marketplace, then install Axon from `/plugins`:
+
+```bash
+codex plugin marketplace add Strandingsism/axon
+```
+
+For local development, add this checkout directly:
+
+```bash
+codex plugin marketplace add D:/Reaserch/Axon/axon
+```
+
 ## Directory Structure
 
 ```
 axon/
+├── .agents/plugins/marketplace.json
 ├── package.json
 ├── skills/          # 10 skill definitions (SKILL.md each)
 ├── docs/
