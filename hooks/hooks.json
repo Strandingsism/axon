@@ -9,6 +9,11 @@
             "command": "node ${PLUGIN_ROOT}/hooks/inject-context.mjs",
             "commandWindows": "node %PLUGIN_ROOT%/hooks/inject-context.mjs",
             "statusMessage": "Axon: loading methodology"
+          },
+          {
+            "type": "command",
+            "command": "node ${PLUGIN_ROOT}/hooks/auto-attach-hud.mjs",
+            "commandWindows": "node %PLUGIN_ROOT%/hooks/auto-attach-hud.mjs"
           }
         ]
       }

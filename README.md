@@ -57,6 +57,9 @@ No state transition graph or event timeline is inferred.
 
 `axon hud attach` uses a tmux-compatible mux layer. On Windows it prefers `psmux`; on Unix-like systems it uses `tmux`, including cmux's tmux compatibility shim when present.
 
+When Axon runs in Codex CLI, it tries to attach the HUD automatically at session
+start. Set `AXON_HUD_AUTO_ATTACH=0` before launching `codex` to disable this.
+
 ## Install
 
 Add the Axon marketplace, then install Axon from `/plugins`:
