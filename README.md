@@ -1,6 +1,6 @@
 # Axon
 
-A lean, focused workflow layer for AI coding agents. **10 skills. No bloat.**
+A lean, focused workflow layer for AI coding agents. **10 lifecycle skills plus workflow authoring.**
 
 Axon strips the multi-agent orchestration concept down to its essence: a clean development methodology encoded as composable skills. Each skill has a single, non-overlapping purpose.
 
@@ -11,7 +11,7 @@ Axon strips the multi-agent orchestration concept down to its essence: a clean d
 - **Evidence over claims.** No completion claim without fresh verification output.
 - **Composable, not orchestrated.** Skills chain naturally. No mega-pipeline that tries to automate everything.
 
-## The 10 Skills
+## The 10 Lifecycle Skills
 
 | # | Skill | When | Output |
 |---|-------|------|--------|
@@ -25,6 +25,14 @@ Axon strips the multi-agent orchestration concept down to its essence: a clean d
 | 8 | `review` | After each task, before merge | Severity-rated findings, all resolved |
 | 9 | `finish` | After all tasks pass review | Merged/PR'd/kept/discarded branch |
 | 10 | `verify` | Before any completion claim | Fresh command output proving the claim |
+
+## Workflow Authoring
+
+| Skill | When | Output |
+|-------|------|--------|
+| `create-hook` | User wants to customize Codex workflow automation | Project-local `.codex/hooks.json`, hook script, TDD fixture, and docs |
+
+`create-hook` is not part of the lifecycle chain. It creates tested Codex hooks for project-specific workflow automation.
 
 ## Flow
 
@@ -41,17 +49,23 @@ dream / brainstorm ──→ write-plan ──→ implement / execute ──→ 
 
 ```
 axon/
-├── skills/          # 10 skill definitions (SKILL.md each)
-├── docs/
-│   ├── specs/       # Design documents (brainstorm output)
-│   └── plans/       # Implementation plans (write-plan output)
-├── templates/       # AGENTS.md and other bootstrapping templates
-└── src/             # CLI implementation
+├── .agents/
+│   └── plugins/
+│       └── marketplace.json   # Codex marketplace entry
+├── plugins/
+│   └── axon/                  # Published plugin payload
+│       ├── .codex-plugin/
+│       │   └── plugin.json    # Plugin manifest
+│       ├── skills/            # Lifecycle and workflow-authoring skills
+│       ├── hooks/             # Lifecycle hooks
+│       ├── docs/              # Bundled workflow examples/templates
+│       └── templates/         # AGENTS.md and bootstrapping templates
+└── README.md
 ```
 
 ## Compared to OMX
 
-OMX ships 52 skills. Axon ships 10. Here's what was cut and why:
+OMX ships 52 skills. Axon keeps 10 lifecycle skills and one workflow-authoring skill. Here's what was cut and why:
 
 - **Deprecated skills** — dead code. Gone.
 - **Role prompts posing as skills** — prompts define agent behavior; skills define workflows. Separate concerns.
