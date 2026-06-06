@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Use before any completion claim. Run the verification command, read the full output, then claim the result. Evidence before claims, always.
+description: "Use before any completion claim. Run the verification command, read the full output, then claim the result. Evidence before claims, always."
 ---
 
 # Verification Before Completion

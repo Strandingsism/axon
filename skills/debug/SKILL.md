@@ -1,6 +1,6 @@
 ---
 name: debug
-description: Use when something is broken and you don't know why. Systematic 4-phase root cause investigation. No fixes without understanding the cause first.
+description: "Use when something is broken and you don't know why. Systematic 4-phase root cause investigation. No fixes without understanding the cause first."
 ---
 
 # Systematic Debugging

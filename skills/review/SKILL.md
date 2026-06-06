@@ -1,6 +1,6 @@
 ---
 name: review
-description: Use after completing a task, feature, or fix. Two-stage review: spec compliance first, then code quality. Critical issues block progress.
+description: "Use after completing a task, feature, or fix. Two-stage review: spec compliance first, then code quality. Critical issues block progress."
 ---
 
 # Code Review

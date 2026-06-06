@@ -1,6 +1,6 @@
 ---
 name: brainstorm
-description: Use before any creative or implementation work. Clarify user intent, explore approaches, and get design approval before writing code.
+description: "Use before any creative or implementation work. Clarify user intent, explore approaches, and get design approval before writing code."
 ---
 
 # Brainstorming Ideas Into Designs

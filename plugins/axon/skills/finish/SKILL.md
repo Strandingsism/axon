@@ -1,6 +1,6 @@
 ---
 name: finish
-description: Use after all tasks pass review. Verify tests, detect the environment, present merge/PR/keep/discard options, and clean up.
+description: "Use after all tasks pass review. Verify tests, detect the environment, present merge/PR/keep/discard options, and clean up."
 ---
 
 # Finishing a Development Branch
