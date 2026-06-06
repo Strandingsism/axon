@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { parseMarketplaceList, parsePluginList, setupAxon } from '../src/setup.mjs';
+import { parseMarketplaceList, parsePluginList, resolveCodexInvocation, setupAxon } from '../src/setup.mjs';
 
 const marketplaceList = `MARKETPLACE             ROOT
 openai-bundled          C:\\Users\\Kevin\\.codex\\.tmp\\bundled-marketplaces\\openai-bundled
@@ -12,7 +12,7 @@ const currentPluginList = `Marketplace \`axon\`
 C:\\Users\\Kevin\\.codex\\.tmp\\marketplaces\\axon\\.agents\\plugins\\marketplace.json
 
 PLUGIN      STATUS              VERSION  PATH
-axon@axon   installed, enabled  0.1.3    C:\\Users\\Kevin\\.codex\\plugins\\cache\\axon\\axon\\0.1.3
+axon@axon   installed, enabled  0.1.4    C:\\Users\\Kevin\\.codex\\plugins\\cache\\axon\\axon\\0.1.4
 `;
 
 test('parseMarketplaceList finds configured Axon marketplace', () => {
@@ -26,16 +26,43 @@ test('parsePluginList reads installed plugin status and version', () => {
   assert.deepEqual(parsePluginList(currentPluginList), {
     selector: 'axon@axon',
     status: 'installed, enabled',
-    version: '0.1.3',
-    path: 'C:\\Users\\Kevin\\.codex\\plugins\\cache\\axon\\axon\\0.1.3',
+    version: '0.1.4',
+    path: 'C:\\Users\\Kevin\\.codex\\plugins\\cache\\axon\\axon\\0.1.4',
     installed: true,
+  });
+});
+
+test('resolveCodexInvocation uses npm Codex entrypoint on Windows', () => {
+  const result = resolveCodexInvocation({
+    platform: 'win32',
+    pathValue: 'D:\\Dev\\nodejs',
+    nodePath: 'D:\\Dev\\nodejs\\node.exe',
+    existsFile: (path) => path === 'D:\\Dev\\nodejs\\node_modules\\@openai\\codex\\bin\\codex.js',
+  });
+
+  assert.deepEqual(result, {
+    command: 'D:\\Dev\\nodejs\\node.exe',
+    args: ['D:\\Dev\\nodejs\\node_modules\\@openai\\codex\\bin\\codex.js'],
+  });
+});
+
+test('resolveCodexInvocation falls back to codex.exe on Windows', () => {
+  const result = resolveCodexInvocation({
+    platform: 'win32',
+    pathValue: 'C:\\Program Files\\WindowsApps',
+    existsFile: (path) => path === 'C:\\Program Files\\WindowsApps\\codex.exe',
+  });
+
+  assert.deepEqual(result, {
+    command: 'C:\\Program Files\\WindowsApps\\codex.exe',
+    args: [],
   });
 });
 
 test('setupAxon exits current when installed version matches', () => {
   const calls = [];
   const result = setupAxon({
-    expectedVersion: '0.1.3',
+    expectedVersion: '0.1.4',
     execCodex: (args) => {
       calls.push(args);
       if (args.join(' ') === 'plugin marketplace list') return { status: 0, stdout: marketplaceList, stderr: '' };
@@ -55,7 +82,7 @@ test('setupAxon installs missing marketplace and plugin', () => {
   const calls = [];
   let pluginInstalled = false;
   const result = setupAxon({
-    expectedVersion: '0.1.3',
+    expectedVersion: '0.1.4',
     execCodex: (args) => {
       calls.push(args);
       const command = args.join(' ');
@@ -90,7 +117,7 @@ test('setupAxon refreshes existing marketplace before installing missing plugin'
   const calls = [];
   let pluginInstalled = false;
   const result = setupAxon({
-    expectedVersion: '0.1.3',
+    expectedVersion: '0.1.4',
     execCodex: (args) => {
       calls.push(args);
       const command = args.join(' ');
@@ -124,9 +151,9 @@ test('setupAxon refreshes existing marketplace before installing missing plugin'
 test('setupAxon upgrades stale plugin', () => {
   const calls = [];
   let upgraded = false;
-  const stalePluginList = currentPluginList.replaceAll('0.1.3', '0.1.2');
+  const stalePluginList = currentPluginList.replaceAll('0.1.4', '0.1.3');
   const result = setupAxon({
-    expectedVersion: '0.1.3',
+    expectedVersion: '0.1.4',
     execCodex: (args) => {
       calls.push(args);
       const command = args.join(' ');

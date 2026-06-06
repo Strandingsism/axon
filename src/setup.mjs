@@ -1,12 +1,48 @@
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
+import { delimiter, join } from 'node:path';
 
 const DEFAULT_MARKETPLACE_NAME = 'axon';
 const DEFAULT_MARKETPLACE_SOURCE = 'Strandingsism/axon';
 const DEFAULT_PLUGIN_NAME = 'axon';
 
+function existsFile(path) {
+  try {
+    return statSync(path).isFile();
+  } catch {
+    return false;
+  }
+}
+
+function pathEntries(pathValue = process.env.Path ?? process.env.PATH ?? '') {
+  return String(pathValue)
+    .split(delimiter)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+export function resolveCodexInvocation(options = {}) {
+  const platform = options.platform || process.platform;
+  const existsFileImpl = options.existsFile || existsFile;
+  const pathValue = options.pathValue ?? process.env.Path ?? process.env.PATH ?? '';
+  const nodePath = options.nodePath || process.execPath;
+
+  if (platform === 'win32') {
+    for (const entry of pathEntries(pathValue)) {
+      const npmCodex = join(entry, 'node_modules', '@openai', 'codex', 'bin', 'codex.js');
+      if (existsFileImpl(npmCodex)) return { command: nodePath, args: [npmCodex] };
+
+      const codexExe = join(entry, 'codex.exe');
+      if (existsFileImpl(codexExe)) return { command: codexExe, args: [] };
+    }
+  }
+
+  return { command: 'codex', args: [] };
+}
+
 function defaultExecCodex(args) {
-  const result = spawnSync('codex', args, {
+  const invocation = resolveCodexInvocation();
+  const result = spawnSync(invocation.command, [...invocation.args, ...args], {
     encoding: 'utf8',
     ...(process.platform === 'win32' ? { windowsHide: true } : {}),
   });
@@ -19,7 +55,8 @@ function defaultExecCodex(args) {
 }
 
 function localPackageVersion() {
-  const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  const pkgPath = new URL('../package.json', import.meta.url);
+  const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
   return pkg.version;
 }
 
