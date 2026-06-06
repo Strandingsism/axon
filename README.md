@@ -45,6 +45,7 @@ Axon includes a read-only terminal HUD for workflow visibility:
 axon hud          # render once
 axon hud --watch  # refresh every second
 axon hud --json   # print the raw HUD model
+axon hud attach   # open --watch in a tmux-compatible pane
 ```
 
 The HUD reads only:
@@ -53,6 +54,8 @@ The HUD reads only:
 - `docs/tasks.json` — task list and completion state
 
 No state transition graph or event timeline is inferred.
+
+`axon hud attach` uses a tmux-compatible mux layer. On Windows it prefers `psmux`; on Unix-like systems it uses `tmux`, including cmux's tmux compatibility shim when present.
 
 ## Directory Structure
 
