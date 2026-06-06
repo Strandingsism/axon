@@ -93,12 +93,14 @@ codex plugin marketplace add D:/Reaserch/Axon/axon
 axon/
 ├── .agents/plugins/marketplace.json
 ├── package.json
-├── skills/          # 10 skill definitions (SKILL.md each)
-├── docs/
-│   ├── specs/       # Design documents (brainstorm output)
-│   └── plans/       # Implementation plans (write-plan output)
+├── plugins/
+│   └── axon/        # Codex plugin payload
+│       ├── .codex-plugin/plugin.json
+│       ├── skills/  # 10 skill definitions (SKILL.md each)
+│       ├── hooks/
+│       ├── docs/
+│       └── templates/
 ├── tdd/             # TDD tests for Axon itself
-├── templates/       # AGENTS.md and other bootstrapping templates
 └── src/             # CLI implementation
 ```
 

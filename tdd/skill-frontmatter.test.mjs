@@ -15,7 +15,7 @@ function collectSkillFiles(dir) {
 }
 
 test('all skill descriptions are quoted YAML scalars', () => {
-  const files = collectSkillFiles('skills');
+  const files = collectSkillFiles('plugins/axon/skills');
   assert.ok(files.length > 0, 'expected skill files');
 
   for (const file of files) {
