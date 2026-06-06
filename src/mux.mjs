@@ -1,9 +1,10 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, statSync } from 'node:fs';
 import { delimiter, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const DEFAULT_HUD_HEIGHT = 8;
+const DEFAULT_SESSION_PREFIX = 'axon';
 
 function existsFile(path) {
   try {
@@ -57,10 +58,21 @@ export function shellEscapeSingle(value) {
   return `'${String(value).replace(/'/g, `'\\''`)}'`;
 }
 
+function shellEscapeToken(value) {
+  const text = String(value);
+  return /^[A-Za-z0-9_./:@%+=,-]+$/.test(text) ? text : shellEscapeSingle(text);
+}
+
 export function buildHudWatchCommand(options = {}) {
   const nodePath = options.nodePath || process.execPath;
   const cliPath = options.cliPath || fileURLToPath(new URL('./cli/axon.mjs', import.meta.url));
   return `exec env AXON_HUD=1 ${shellEscapeSingle(nodePath)} ${shellEscapeSingle(cliPath)} hud --watch`;
+}
+
+export function buildCodexCommand(options = {}) {
+  const codexCommand = options.codexCommand || 'codex';
+  const codexArgs = Array.isArray(options.codexArgs) ? options.codexArgs : [];
+  return [codexCommand, ...codexArgs].map(shellEscapeToken).join(' ');
 }
 
 export function parsePaneSnapshot(output) {
@@ -102,6 +114,13 @@ function defaultExecMux(muxBinary) {
   });
 }
 
+function defaultAttachMux(muxBinary) {
+  return (args) => spawnSync(muxBinary, args, {
+    stdio: 'inherit',
+    ...(process.platform === 'win32' ? { windowsHide: false } : {}),
+  });
+}
+
 function readCurrentPane(execMux) {
   try {
     return parsePaneId(execMux(['display-message', '-p', '#{pane_id}']));
@@ -112,7 +131,7 @@ function readCurrentPane(execMux) {
 
 export function attachHud(options = {}) {
   const cwd = options.cwd || process.cwd();
-  const muxBinary = options.muxBinary || resolveMuxBinary();
+  const muxBinary = Object.hasOwn(options, 'muxBinary') ? options.muxBinary : resolveMuxBinary();
   if (!muxBinary) return { status: 'unavailable', paneId: null, mux: null };
 
   const execMux = options.execMux || defaultExecMux(muxBinary);
@@ -151,4 +170,55 @@ export function attachHud(options = {}) {
   return paneId
     ? { status: 'created', paneId, mux: muxBinary }
     : { status: 'failed', paneId: null, mux: muxBinary };
+}
+
+export function buildSessionName(options = {}) {
+  const prefix = options.prefix || DEFAULT_SESSION_PREFIX;
+  const suffix = options.suffix || `${Date.now()}-${process.pid}`;
+  return `${prefix}-${suffix}`.replace(/[^A-Za-z0-9_.-]/g, '-');
+}
+
+export function launchCodexWorkspace(options = {}) {
+  const cwd = options.cwd || process.cwd();
+  const muxBinary = Object.hasOwn(options, 'muxBinary') ? options.muxBinary : resolveMuxBinary();
+  if (!muxBinary) return { status: 'unavailable', sessionName: null, mux: null, exitCode: 1 };
+
+  const execMux = options.execMux || defaultExecMux(muxBinary);
+  const attachMux = options.attachMux || defaultAttachMux(muxBinary);
+  const sessionName = options.sessionName || buildSessionName(options);
+  const codexCommand = buildCodexCommand({
+    codexCommand: options.codexCommand,
+    codexArgs: options.codexArgs,
+  });
+  const hudCommand = buildHudWatchCommand({
+    nodePath: options.nodePath,
+    cliPath: options.cliPath,
+  });
+
+  try {
+    execMux(['new-session', '-d', '-s', sessionName, '-c', cwd, codexCommand]);
+    execMux(['split-window', '-h', '-t', sessionName, '-c', cwd, hudCommand]);
+    execMux(['select-pane', '-t', `${sessionName}:0.0`]);
+
+    if (options.attach === false) {
+      return { status: 'created', sessionName, mux: muxBinary, exitCode: 0 };
+    }
+
+    const attached = attachMux(['attach-session', '-t', sessionName]);
+    const exitCode = attached.status ?? 0;
+    return {
+      status: exitCode === 0 ? 'attached' : 'failed',
+      sessionName,
+      mux: muxBinary,
+      exitCode,
+    };
+  } catch (error) {
+    return {
+      status: 'failed',
+      sessionName,
+      mux: muxBinary,
+      exitCode: 1,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
 }

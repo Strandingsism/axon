@@ -42,6 +42,8 @@ dream / brainstorm ──→ write-plan ──→ implement / execute ──→ 
 Axon includes a read-only terminal HUD for workflow visibility:
 
 ```bash
+axon              # start Codex and Axon HUD in mux panes
+axon codex        # same as axon; forwards extra args to codex
 axon hud          # render once
 axon hud --watch  # refresh every second
 axon hud --json   # print the raw HUD model
@@ -57,8 +59,8 @@ No state transition graph or event timeline is inferred.
 
 `axon hud attach` uses a tmux-compatible mux layer. On Windows it prefers `psmux`; on Unix-like systems it uses `tmux`, including cmux's tmux compatibility shim when present.
 
-When Axon runs in Codex CLI, it tries to attach the HUD automatically at session
-start. Set `AXON_HUD_AUTO_ATTACH=0` before launching `codex` to disable this.
+Axon does not auto-open panes from Codex `SessionStart`. Use `axon` when you want
+the two-pane Axon workspace; use `codex` when you want the plain Codex CLI.
 
 ## Install
 

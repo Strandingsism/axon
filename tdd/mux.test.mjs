@@ -2,10 +2,13 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  buildCodexCommand,
   buildHudWatchCommand,
+  buildSessionName,
   findExistingHudPane,
   resolveMuxBinary,
   attachHud,
+  launchCodexWorkspace,
 } from '../src/mux.mjs';
 
 test('resolveMuxBinary prefers psmux on native Windows', () => {
@@ -32,6 +35,19 @@ test('buildHudWatchCommand marks the pane without tmux -e env injection', () => 
   assert.match(command, /^exec env AXON_HUD=1 /);
   assert.match(command, /'\/usr\/bin\/node' '\/repo\/src\/cli\/axon\.mjs' hud --watch$/);
   assert.doesNotMatch(command, / -e AXON_HUD=1 /);
+});
+
+test('buildCodexCommand forwards codex arguments', () => {
+  const command = buildCodexCommand({
+    codexCommand: 'codex',
+    codexArgs: ['--model', 'gpt-5'],
+  });
+
+  assert.equal(command, 'codex --model gpt-5');
+});
+
+test('buildSessionName keeps tmux-safe characters', () => {
+  assert.equal(buildSessionName({ prefix: 'axon dev', suffix: 'test:1' }), 'axon-dev-test-1');
 });
 
 test('findExistingHudPane detects Axon HUD watch panes', () => {
@@ -82,4 +98,44 @@ test('attachHud creates a detached split pane when none exists', () => {
   assert.deepEqual(result, { status: 'created', paneId: '%3', mux: 'tmux' });
   assert.deepEqual(split.slice(0, 8), ['split-window', '-v', '-l', '8', '-d', '-t', '%1', '-c']);
   assert.equal(split.at(-1), "exec env AXON_HUD=1 '/usr/bin/node' '/repo/src/cli/axon.mjs' hud --watch");
+});
+
+test('launchCodexWorkspace creates codex and HUD panes before attach', () => {
+  const calls = [];
+  const result = launchCodexWorkspace({
+    cwd: '/repo',
+    muxBinary: 'tmux',
+    sessionName: 'axon-test',
+    nodePath: '/usr/bin/node',
+    cliPath: '/repo/src/cli/axon.mjs',
+    codexArgs: ['--model', 'gpt-5'],
+    execMux: (args) => {
+      calls.push(args);
+      return '';
+    },
+    attachMux: (args) => {
+      calls.push(args);
+      return { status: 0 };
+    },
+  });
+
+  assert.deepEqual(result, { status: 'attached', sessionName: 'axon-test', mux: 'tmux', exitCode: 0 });
+  assert.deepEqual(calls[0], ['new-session', '-d', '-s', 'axon-test', '-c', '/repo', 'codex --model gpt-5']);
+  assert.deepEqual(calls[1], [
+    'split-window',
+    '-h',
+    '-t',
+    'axon-test',
+    '-c',
+    '/repo',
+    "exec env AXON_HUD=1 '/usr/bin/node' '/repo/src/cli/axon.mjs' hud --watch",
+  ]);
+  assert.deepEqual(calls[2], ['select-pane', '-t', 'axon-test:0.0']);
+  assert.deepEqual(calls[3], ['attach-session', '-t', 'axon-test']);
+});
+
+test('launchCodexWorkspace reports unavailable when no mux exists', () => {
+  const result = launchCodexWorkspace({ muxBinary: null });
+
+  assert.deepEqual(result, { status: 'unavailable', sessionName: null, mux: null, exitCode: 1 });
 });
