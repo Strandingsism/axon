@@ -57,9 +57,11 @@ test('buildHudWatchCommand uses PowerShell on Windows for psmux', () => {
     cliPath: 'D:\\Reaserch\\Axon\\axon\\src\\cli\\axon.mjs',
   });
 
-  assert.match(command, /^powershell\.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command /);
+  assert.match(command, /^powershell\.exe -NoExit -NoLogo -NoProfile -ExecutionPolicy Bypass -Command /);
   assert.match(command, /\$env:AXON_HUD='1'/);
   assert.match(command, /'D:\\Dev\\nodejs\\node\.exe' 'D:\\Reaserch\\Axon\\axon\\src\\cli\\axon\.mjs' hud --watch/);
+  assert.match(command, /Axon HUD exited/);
+  assert.match(command, /Press Enter to close this pane/);
 });
 
 test('buildCodexCommand forwards codex arguments', () => {

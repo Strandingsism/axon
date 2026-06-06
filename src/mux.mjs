@@ -73,11 +73,25 @@ function buildPowerShellInvocation(commandParts) {
   return `powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "& ${command}"`;
 }
 
+function buildPowerShellHudCommand(nodePath, cliPath) {
+  const body = [
+    "$env:AXON_HUD='1'",
+    `$ErrorActionPreference='Continue'`,
+    `& ${powershellEscapeSingle(nodePath)} ${powershellEscapeSingle(cliPath)} hud --watch`,
+    `$code=$LASTEXITCODE`,
+    `Write-Host ''`,
+    `Write-Host 'Axon HUD exited.'`,
+    `if ($code) { Write-Host ('Exit code: ' + $code) }`,
+    `Read-Host 'Press Enter to close this pane'`,
+  ].join('; ');
+  return `powershell.exe -NoExit -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "${body}"`;
+}
+
 export function buildHudWatchCommand(options = {}) {
   const nodePath = options.nodePath || process.execPath;
   const cliPath = options.cliPath || fileURLToPath(new URL('./cli/axon.mjs', import.meta.url));
   if ((options.platform || process.platform) === 'win32') {
-    return `powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$env:AXON_HUD='1'; & ${powershellEscapeSingle(nodePath)} ${powershellEscapeSingle(cliPath)} hud --watch"`;
+    return buildPowerShellHudCommand(nodePath, cliPath);
   }
   return `exec env AXON_HUD=1 ${shellEscapeSingle(nodePath)} ${shellEscapeSingle(cliPath)} hud --watch`;
 }
