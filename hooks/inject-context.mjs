@@ -1,9 +1,11 @@
 import { readFileSync, existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = process.env.PLUGIN_ROOT;
+const hookDir = dirname(fileURLToPath(import.meta.url));
+const root = process.env.PLUGIN_ROOT || resolve(hookDir, '..');
 const tmpl = resolve(root, 'templates', 'AGENTS.md');
-const context = readFileSync(tmpl, 'utf-8');
+const context = existsSync(tmpl) ? readFileSync(tmpl, 'utf-8') : '';
 
 // Inject current workflow state if available
 const stateFile = resolve(process.cwd(), '.axon', 'state.json');
