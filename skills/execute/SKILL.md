@@ -1,6 +1,6 @@
 ---
 name: execute
-description: Use for single-task plans or tightly coupled tasks. Main agent executes inline with a self-referential loop — no subagents. TDD per task, self-verify, iterate until done.
+description: "Use for single-task plans or tightly coupled tasks. Main agent executes inline with a self-referential loop — no subagents. TDD per task, self-verify, iterate until done."
 ---
 
 # Inline Execution Loop

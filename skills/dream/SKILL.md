@@ -1,6 +1,6 @@
 ---
 name: dream
-description: Use when the user wants to build something new from scratch. Greenfield ideation — use AskUserQuestion to discover vision, explore trade-offs, crystallize scope, and get design approval.
+description: "Use when the user wants to build something new from scratch. Greenfield ideation — use AskUserQuestion to discover vision, explore trade-offs, crystallize scope, and get design approval."
 ---
 
 # Dream — Greenfield Ideation

@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Use after an approved plan. Execute tasks one at a time with fresh subagents, two-stage review per task, and continuous progress.
+description: "Use after an approved plan. Execute tasks one at a time with fresh subagents, two-stage review per task, and continuous progress."
 ---
 
 # Subagent-Driven Implementation

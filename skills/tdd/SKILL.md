@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Use when implementing any feature or bugfix. Write the test first, watch it fail, then write minimal code to pass.
+description: "Use when implementing any feature or bugfix. Write the test first, watch it fail, then write minimal code to pass."
 ---
 
 # Test-Driven Development

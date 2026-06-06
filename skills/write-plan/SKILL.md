@@ -1,6 +1,6 @@
 ---
 name: write-plan
-description: Use after an approved design. Break the design into bite-sized implementation tasks with exact file paths, complete code blocks, and verification steps.
+description: "Use after an approved design. Break the design into bite-sized implementation tasks with exact file paths, complete code blocks, and verification steps."
 ---
 
 # Writing Implementation Plans
