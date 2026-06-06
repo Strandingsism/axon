@@ -1,6 +1,6 @@
 {
   "name": "axon",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Lean development methodology — 10 skills, no bloat. Dream/brainstorm → plan → implement/execute with TDD → review → finish.",
   "author": {
     "name": "Axon"

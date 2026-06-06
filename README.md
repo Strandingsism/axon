@@ -58,7 +58,20 @@ The HUD reads only:
 
 No state transition graph or event timeline is inferred.
 
-`axon hud attach` uses a tmux-compatible mux layer. On Windows it prefers `psmux`; on Unix-like systems it uses `tmux`, including cmux's tmux compatibility shim when present.
+`axon` uses a platform-native mux layer: Windows uses PSMUX, while macOS and
+Linux use tmux. The default workspace is stacked vertically: Codex gets the top
+80% of the terminal, and `axon hud --watch` gets the bottom 20%.
+
+Install the mux first if needed:
+
+```bash
+winget install psmux   # Windows
+brew install tmux      # macOS
+sudo apt install tmux  # Ubuntu/Debian
+```
+
+`axon hud attach` uses the same mux layer. It opens a small read-only HUD pane
+for an already-running mux session.
 
 Axon does not auto-open panes from Codex `SessionStart`. Use `axon` when you want
 the two-pane Axon workspace; use `codex` when you want the plain Codex CLI.

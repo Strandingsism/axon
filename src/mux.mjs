@@ -4,6 +4,7 @@ import { delimiter, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const DEFAULT_HUD_HEIGHT = 8;
+const DEFAULT_HUD_PERCENT = 20;
 const DEFAULT_SESSION_PREFIX = 'axon';
 
 function existsFile(path) {
@@ -45,12 +46,12 @@ export function resolveMuxBinary(options = {}) {
   if (platform === 'win32') {
     return (
       resolveFromPath('psmux', pathValue, existsFileImpl, platform)
+      || resolveFromPath('pmux', pathValue, existsFileImpl, platform)
       || resolveFromPath('tmux', pathValue, existsFileImpl, platform)
     );
   }
 
-  // cmux exposes tmux compatibility through a tmux shim, so the adapter uses
-  // tmux-compatible commands instead of calling cmux-specific internals.
+  // macOS and Linux use tmux directly.
   return resolveFromPath('tmux', pathValue, existsFileImpl, platform) || (existsSync('/usr/bin/tmux') ? '/usr/bin/tmux' : null);
 }
 
@@ -58,20 +59,35 @@ export function shellEscapeSingle(value) {
   return `'${String(value).replace(/'/g, `'\\''`)}'`;
 }
 
+function powershellEscapeSingle(value) {
+  return `'${String(value).replace(/'/g, "''")}'`;
+}
+
 function shellEscapeToken(value) {
   const text = String(value);
   return /^[A-Za-z0-9_./:@%+=,-]+$/.test(text) ? text : shellEscapeSingle(text);
 }
 
+function buildPowerShellInvocation(commandParts) {
+  const command = commandParts.map(powershellEscapeSingle).join(' ');
+  return `powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "& ${command}"`;
+}
+
 export function buildHudWatchCommand(options = {}) {
   const nodePath = options.nodePath || process.execPath;
   const cliPath = options.cliPath || fileURLToPath(new URL('./cli/axon.mjs', import.meta.url));
+  if ((options.platform || process.platform) === 'win32') {
+    return `powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$env:AXON_HUD='1'; & ${powershellEscapeSingle(nodePath)} ${powershellEscapeSingle(cliPath)} hud --watch"`;
+  }
   return `exec env AXON_HUD=1 ${shellEscapeSingle(nodePath)} ${shellEscapeSingle(cliPath)} hud --watch`;
 }
 
 export function buildCodexCommand(options = {}) {
   const codexCommand = options.codexCommand || 'codex';
   const codexArgs = Array.isArray(options.codexArgs) ? options.codexArgs : [];
+  if ((options.platform || process.platform) === 'win32') {
+    return buildPowerShellInvocation([codexCommand, ...codexArgs]);
+  }
   return [codexCommand, ...codexArgs].map(shellEscapeToken).join(' ');
 }
 
@@ -93,7 +109,7 @@ export function parsePaneSnapshot(output) {
 
 export function isAxonHudPane(pane) {
   const command = `${pane?.startCommand || ''} ${pane?.currentCommand || ''}`;
-  return /\bAXON_HUD=1\b/.test(command) && /\bhud\b/.test(command) && /--watch\b/.test(command);
+  return /\bAXON_HUD\b/.test(command) && /\bhud\b/.test(command) && /--watch\b/.test(command);
 }
 
 export function findExistingHudPane(panes, currentPaneId) {
@@ -150,6 +166,7 @@ export function attachHud(options = {}) {
   const hudCommand = buildHudWatchCommand({
     nodePath: options.nodePath,
     cliPath: options.cliPath,
+    platform: options.platform,
   });
   const splitArgs = [
     'split-window',
@@ -189,15 +206,20 @@ export function launchCodexWorkspace(options = {}) {
   const codexCommand = buildCodexCommand({
     codexCommand: options.codexCommand,
     codexArgs: options.codexArgs,
+    platform: options.platform,
   });
   const hudCommand = buildHudWatchCommand({
     nodePath: options.nodePath,
     cliPath: options.cliPath,
+    platform: options.platform,
   });
+  const hudPercent = Number.isFinite(options.hudPercent) && options.hudPercent > 0 && options.hudPercent < 100
+    ? Math.floor(options.hudPercent)
+    : DEFAULT_HUD_PERCENT;
 
   try {
     execMux(['new-session', '-d', '-s', sessionName, '-c', cwd, codexCommand]);
-    execMux(['split-window', '-h', '-t', sessionName, '-c', cwd, hudCommand]);
+    execMux(['split-window', '-v', '-p', String(hudPercent), '-t', sessionName, '-c', cwd, hudCommand]);
     execMux(['select-pane', '-t', `${sessionName}:0.0`]);
 
     if (options.attach === false) {

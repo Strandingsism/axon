@@ -42,7 +42,7 @@ function runSetup() {
 function startCodexWorkspace(codexArgs = []) {
   const result = launchCodexWorkspace({ codexArgs });
   if (result.status === 'unavailable') {
-    process.stderr.write('No tmux-compatible mux found. Install psmux on Windows or tmux/cmux on Unix-like systems.\n');
+    process.stderr.write('No supported mux found. Install PSMUX on Windows or tmux on macOS/Linux.\n');
     return 1;
   }
   if (result.status === 'failed') {
@@ -81,7 +81,7 @@ function run(argv) {
   if (flags[0] === 'attach') {
     const result = attachHud();
     if (result.status === 'unavailable') {
-      process.stderr.write('No tmux-compatible mux found. Install psmux on Windows or run inside cmux/tmux.\n');
+      process.stderr.write('No supported mux found. Install PSMUX on Windows or tmux on macOS/Linux.\n');
       process.stdout.write(renderHud(loadHudModel(process.cwd())));
       return 1;
     }
