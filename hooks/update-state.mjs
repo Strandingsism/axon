@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-// PreToolUse hook — state recording + doc injection + tasks.json reset
+// PreToolUse hook — state recording + orientation prompt + tasks.json reset
 // Never blocks. Only on Skill("implement") | Skill("execute") | Skill("review") | Skill("finish").
 
 const AXON_SKILLS = ['implement', 'execute', 'review', 'finish'];
@@ -17,14 +17,6 @@ const STATE_MAP = {
   finish:    'finishing',
 };
 
-// skill → injected docs
-const REQUIRED_DOCS = {
-  implement: ['docs/interface-registry.md', 'docs/project-map.md'],
-  execute:   ['docs/interface-registry.md', 'docs/project-map.md'],
-  review:    ['docs/interface-registry.md', 'docs/project-map.md'],
-  finish:    ['docs/project-map.md'],
-};
-
 // --- state helper ---
 
 function saveState(state) {
@@ -33,21 +25,14 @@ function saveState(state) {
   writeFileSync(STATE_FILE, JSON.stringify({ state, updatedAt: new Date().toISOString() }, null, 2));
 }
 
-// --- doc helpers ---
-
-function loadDoc(relPath) {
+function loadStateBlock() {
   try {
-    const abs = resolve(CWD, relPath);
-    if (!existsSync(abs)) return null;
-    return readFileSync(abs, 'utf-8');
-  } catch { return null; }
-}
-
-function buildDocBlock(path) {
-  const content = loadDoc(path);
-  if (!content) return null;
-  const label = path === 'docs/interface-registry.md' ? 'INTERFACE REGISTRY' : 'PROJECT MAP';
-  return `## ${label} (injected by Axon)\n${content}`;
+    if (!existsSync(STATE_FILE)) return '';
+    const stateJson = JSON.parse(readFileSync(STATE_FILE, 'utf-8'));
+    return `\n\nCurrent Axon state:\n\`\`\`json\n${JSON.stringify(stateJson, null, 2)}\n\`\`\``;
+  } catch {
+    return '';
+  }
 }
 
 // --- tasks.json helpers ---
@@ -63,22 +48,21 @@ function resetTasksJson() {
   } catch { return null; }
 }
 
-function buildTaskPrompt(skillName, tasksObj) {
-  if (!tasksObj || !tasksObj.tasks?.length) return '';
-  const names = tasksObj.tasks.map(t => `${t.id}. ${t.name}`).join('\n');
+function buildSkillPrompt(skillName, tasksObj) {
   const mode = skillName === 'implement' ? 'subagent-driven' : 'inline';
-  return `## TASK SYNC (injected by Axon — ${skillName} / ${mode})
+  const taskNote = tasksObj?.tasks?.length
+    ? '\n- docs/tasks.json has been reset to pending; read it and mirror those tasks in the Codex task system.'
+    : '';
 
-\`docs/tasks.json\` has been reset. All tasks are \`pending\`.
+  return `Axon skill gate: ${skillName} (${mode}).
 
-**You MUST:**
-1. Create matching tasks in the Codex Task system from the list below
-2. After completing each task, update its status in \`docs/tasks.json\` to \`"done"\`
-3. When \`docs/tasks.json\` shows all tasks \`"done"\`, ask the user:
-   > "All tasks complete. Proceed to review?"
-
-**Task list:**
-${names}`;
+Before using this skill:
+- Re-check AGENTS.md and relevant docs if the task context is unclear.
+- Use docs/project-map.md for project orientation.
+- Use docs/interface-registry.md for public interfaces and contracts.
+- Use docs/tasks.json for current task progress if it exists.
+- Keep TDD coupled to implementation; default new TDD artifacts to tdd/.${taskNote}
+- Verify before claiming completion.${loadStateBlock()}`;
 }
 
 // --- main ---
@@ -110,21 +94,15 @@ if (!AXON_SKILLS.includes(skillName)) {
 const next = STATE_MAP[skillName];
 if (next) saveState(next);
 
-// --- docs ---
-const docBlocks = (REQUIRED_DOCS[skillName] || [])
-  .map(buildDocBlock)
-  .filter(Boolean);
-
 // --- tasks.json (implement/execute only) ---
-let taskPrompt = '';
+let tasksObj = null;
 if (skillName === 'implement' || skillName === 'execute') {
-  const tasksObj = resetTasksJson();
-  taskPrompt = buildTaskPrompt(skillName, tasksObj);
+  tasksObj = resetTasksJson();
 }
 
-const additionalContext = [...docBlocks, taskPrompt].filter(Boolean).join('\n\n---\n\n');
+const additionalContext = buildSkillPrompt(skillName, tasksObj);
 
 process.stdout.write(JSON.stringify({
   decision: 'allow',
-  ...(additionalContext ? { hookSpecificOutput: { hookEventName: 'PreToolUse', additionalContext } } : {}),
+  hookSpecificOutput: { hookEventName: 'PreToolUse', additionalContext },
 }));

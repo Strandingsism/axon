@@ -1,27 +1,29 @@
 import { readFileSync, existsSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const hookDir = dirname(fileURLToPath(import.meta.url));
-const root = process.env.PLUGIN_ROOT || resolve(hookDir, '..');
-const tmpl = resolve(root, 'templates', 'AGENTS.md');
-const context = existsSync(tmpl) ? readFileSync(tmpl, 'utf-8') : '';
+import { resolve } from 'node:path';
 
 // Inject current workflow state if available
 const stateFile = resolve(process.cwd(), '.axon', 'state.json');
 let stateBlock = '';
 if (existsSync(stateFile)) {
   try {
-    const { state, updatedAt } = JSON.parse(readFileSync(stateFile, 'utf-8'));
-    if (state && state !== 'idle') {
-      stateBlock = `\n\n## Axon Workflow State\nCurrent phase: **${state}** (since ${updatedAt})\n`;
+    const stateJson = JSON.parse(readFileSync(stateFile, 'utf-8'));
+    if (stateJson.state && stateJson.state !== 'idle') {
+      stateBlock = `\n\nCurrent Axon state:\n\`\`\`json\n${JSON.stringify(stateJson, null, 2)}\n\`\`\``;
     }
   } catch {}
 }
 
+const prompt = `Axon is active.
+
+Before working, orient yourself in the current project:
+- Inspect the repository structure.
+- Read AGENTS.md and any local instructions that apply.
+- Read README.md, docs/project-map.md, docs/interface-registry.md, and docs/tasks.json if they exist.
+- Follow Axon workflow: clarify intent, plan, TDD, verify, review, then finish.${stateBlock}`;
+
 process.stdout.write(JSON.stringify({
   hookSpecificOutput: {
     hookEventName: 'SessionStart',
-    additionalContext: context + stateBlock
+    additionalContext: prompt
   }
 }));
