@@ -1,18 +1,42 @@
 #!/usr/bin/env node
 import { loadHudModel, renderHud, renderHudJson, watchHud } from '../hud.mjs';
 import { attachHud, launchCodexWorkspace } from '../mux.mjs';
+import { setupAxon } from '../setup.mjs';
 
 function printHelp() {
   process.stdout.write(`Axon
 
 Usage:
   axon              Start Codex with Axon HUD in mux panes
+  axon setup        Install or upgrade the Axon Codex plugin
   axon codex        Start Codex with Axon HUD in mux panes
   axon hud          Show current HUD once
   axon hud --watch  Refresh HUD every second
   axon hud --json   Print HUD state as JSON
   axon hud attach   Open HUD in a tmux-compatible pane
 `);
+}
+
+function runSetup() {
+  const result = setupAxon();
+  for (const step of result.steps || []) process.stdout.write(`${step}\n`);
+
+  if (result.status === 'current') {
+    process.stdout.write(`Axon plugin is already current (${result.installedVersion}).\n`);
+    return 0;
+  }
+  if (result.status === 'installed') {
+    process.stdout.write(`Axon plugin installed (${result.installedVersion}).\n`);
+    return 0;
+  }
+  if (result.status === 'upgraded') {
+    process.stdout.write(`Axon plugin upgraded to ${result.installedVersion}.\n`);
+    return 0;
+  }
+
+  process.stderr.write(`Axon setup failed during ${result.action || 'setup'}.\n`);
+  if (result.error) process.stderr.write(`${result.error}\n`);
+  return result.exitCode || 1;
 }
 
 function startCodexWorkspace(codexArgs = []) {
@@ -42,6 +66,10 @@ function run(argv) {
 
   if (command === 'codex') {
     return startCodexWorkspace(flags);
+  }
+
+  if (command === 'setup') {
+    return runSetup();
   }
 
   if (command !== 'hud') {

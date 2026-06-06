@@ -43,6 +43,7 @@ Axon includes a read-only terminal HUD for workflow visibility:
 
 ```bash
 axon              # start Codex and Axon HUD in mux panes
+axon setup        # install or upgrade the Axon Codex plugin
 axon codex        # same as axon; forwards extra args to codex
 axon hud          # render once
 axon hud --watch  # refresh every second
@@ -62,12 +63,22 @@ No state transition graph or event timeline is inferred.
 Axon does not auto-open panes from Codex `SessionStart`. Use `axon` when you want
 the two-pane Axon workspace; use `codex` when you want the plain Codex CLI.
 
+`axon setup` checks whether the Axon Codex plugin marketplace and plugin are
+installed. It installs missing pieces, upgrades stale installs to the CLI's
+bundled version, and exits cleanly when everything is already current.
+
 ## Install
 
 Add the Axon marketplace, then install Axon from `/plugins`:
 
 ```bash
 codex plugin marketplace add Strandingsism/axon
+```
+
+If you installed the Axon CLI through npm, run:
+
+```bash
+axon setup
 ```
 
 For local development, add this checkout directly:
