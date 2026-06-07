@@ -317,18 +317,18 @@ Don't:
 For code tasks, final answer should use:
 
 ```text
-完成情况：
-验证方式：
-主要改动：
-风险与未完成：
+Status:
+Verification:
+Main changes:
+Risks and remaining work:
 ```
 
 For conceptual tasks, final answer should use:
 
 ```text
-核心结论：
-原因：
-建议做法：
+Conclusion:
+Reasoning:
+Recommended approach:
 ```
 
 ## 12. Examples
@@ -336,7 +336,7 @@ For conceptual tasks, final answer should use:
 User:
 
 ```text
-修一下登录 bug
+Fix the login bug
 ```
 
 Agent should:
@@ -351,7 +351,7 @@ Agent should:
 User:
 
 ```text
-重构整个状态管理
+Refactor the entire state management layer
 ```
 
 Agent should:
@@ -364,7 +364,7 @@ Agent should:
 User:
 
 ```text
-这个想法是否合理？
+Is this idea reasonable?
 ```
 
 Agent should:
