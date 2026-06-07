@@ -1,74 +1,110 @@
 # Axon
 
-A lean, focused workflow layer for AI coding agents. **10 lifecycle skills plus workflow authoring.**
+Axon is a workflow layer for Codex: user-owned `workflow.md`, composable skills, runtime hooks, and workflow history.
 
-Axon strips the multi-agent orchestration concept down to its essence: a clean development methodology encoded as composable skills. Each skill has a single, non-overlapping purpose.
+It gives coding agents a repeatable way to plan, execute, verify, review, and remember work without forcing a single rigid pipeline.
 
-## Philosophy
+## Why Axon
 
-- **One skill, one purpose.** No aliases, no deprecated shims, no internal-only tools posing as skills.
-- **Hard gates, not suggestions.** Each skill has non-negotiable rules. Violating the letter violates the spirit.
-- **Evidence over claims.** No completion claim without fresh verification output.
-- **Composable, not orchestrated.** Skills chain naturally. No mega-pipeline that tries to automate everything.
+Most coding agents can edit code, but they do not naturally preserve a user's working style across tasks. Large workflow systems solve this by adding heavy orchestration, many commands, and fixed paths.
 
-## The 10 Lifecycle Skills
+Axon takes a smaller approach:
 
-| # | Skill | When | Output |
-|---|-------|------|--------|
-| 1 | `dream` | Greenfield project from scratch | `.axon/specs/YYYY-MM-DD-<topic>-design.md` |
-| 2 | `brainstorm` | Brownfield work in an existing codebase | `.axon/specs/YYYY-MM-DD-<topic>-design.md` |
-| 3 | `write-plan` | After an approved design | `.axon/plans/YYYY-MM-DD-<feature>-plan.md` |
-| 4 | `implement` | Multi-task plan, subagent execution | Working, tested, reviewed code |
-| 5 | `execute` | Single-task plan, inline execution | Working, tested, verified code |
-| 6 | `tdd` | During implementation of any feature or fix | Tests that fail first, then pass |
-| 7 | `debug` | When something is broken and root cause is unknown | Root cause identified + failing test + fix |
-| 8 | `review` | After each task, before merge | Severity-rated findings, all resolved |
-| 9 | `finish` | After all tasks pass review | Merged/PR'd/kept/discarded branch |
-| 10 | `verify` | Before any completion claim | Fresh command output proving the claim |
+- `workflow.md` defines how the agent should work in this project.
+- Skills provide focused lifecycle behavior.
+- Hooks add runtime reminders and event capture.
+- `.axon/history` records how the user actually uses the workflow.
 
-## Workflow Authoring
+The goal is not to make every project follow Axon's workflow. The goal is to let each project define its own workflow and give Codex enough structure to follow it.
 
-| Skill | When | Output |
-|-------|------|--------|
-| `create-hook` | User wants to customize Codex workflow automation | Project-local `.codex/hooks.json`, hook script, TDD fixture, and `.axon/hooks` documentation |
+## Core Concepts
 
-`create-hook` is not part of the lifecycle chain. It creates tested Codex hooks for project-specific workflow automation.
+### `workflow.md`
 
-The canonical workflow file is the user's root-level `workflow.md`. Axon treats it as the project's agent behavior design system: a user-owned source of truth for operating philosophy, workflow tokens, task classes, states, confirmation gates, tool policy, and output contracts. Axon may provide structure placeholders when asked, but the workflow content is fully defined by the user.
+`workflow.md` is the user-owned behavior protocol for the project.
 
-## Flow
+It can describe planning style, risk tolerance, task classes, confirmation gates, verification policy, output contracts, or any other workflow convention. Axon treats it as advisory context, not a fixed schema. Missing sections are not errors.
 
+### Skills
+
+Axon ships 10 lifecycle skills plus one workflow-authoring skill. Each skill has one job and can be invoked directly from Codex.
+
+### Hooks
+
+Hooks provide lightweight runtime behavior:
+
+- orient new sessions
+- prepare skill context
+- record skill usage
+- request history summaries
+- check task progress
+
+Hooks are intentionally small. They do not generate summaries or replace agent judgment.
+
+### History
+
+Axon records real workflow usage in `.axon/history`.
+
+A run starts with the first Axon skill call. A run closes when `finish` is used. After closing, Axon asks the agent to write a human-readable `summary.md` for that run.
+
+## Features
+
+- 10 lifecycle skills: `dream`, `brainstorm`, `write-plan`, `implement`, `execute`, `tdd`, `debug`, `review`, `finish`, `verify`
+- `create-hook` for project-local workflow automation
+- root-level `workflow.md` as the agent behavior protocol
+- `.axon/history` event logs and summaries
+- `.axon/tasks.json` task progress support
+- `.axon/project-map.md` and `.axon/interface-registry.md` workflow examples
+- no HUD, pane manager, or heavy orchestrator
+
+## Install
+
+Add the Axon marketplace from GitHub:
+
+```bash
+codex plugin marketplace add --ref main Strandingsism/axon
 ```
-dream / brainstorm ──→ write-plan ──→ implement / execute ──→ review ──→ finish
-                              │                  │
-                              ▼                  ▼
-                             tdd               debug
-                              │                  │
-                              └────── verify ────┘
+
+Install the plugin:
+
+```bash
+codex plugin add axon@axon
 ```
 
-## Directory Structure
+Update later:
 
-```
-axon/
-├── workflow.md                   # User-owned agent behavior design system
-├── .agents/
-│   └── plugins/
-│       └── marketplace.json   # Codex marketplace entry
-├── plugins/
-│   └── axon/                  # Published plugin payload
-│       ├── .codex-plugin/
-│       │   └── plugin.json    # Plugin manifest
-│       ├── skills/            # Lifecycle and workflow-authoring skills
-│       ├── hooks/             # Lifecycle hooks
-│       ├── .axon/             # Bundled Axon workflow examples/templates
-│       └── templates/         # AGENTS.md and bootstrapping templates
-└── README.md
+```bash
+codex plugin marketplace upgrade axon
+codex plugin add axon@axon
 ```
 
-Runtime history is written by hooks inside target projects:
+Start a new Codex session after installing or updating so the latest skills and hooks are loaded.
 
+## Usage
+
+Use Axon skills directly inside Codex:
+
+```text
+$axon:brainstorm
+$axon:write-plan
+$axon:execute
+$axon:finish
 ```
+
+Typical flow:
+
+```text
+dream / brainstorm -> write-plan -> implement / execute -> review -> finish
+                                 |                  |
+                                 v                  v
+                                tdd               debug
+                                 |                  |
+                                 +------ verify ----+
+```
+
+History layout:
+
+```text
 .axon/history/
 ├── index.json
 ├── active.json
@@ -78,23 +114,28 @@ Runtime history is written by hooks inside target projects:
         └── summary.md
 ```
 
-Skill calls start or append to the active run. `finish` closes the run and asks the agent to write `summary.md`.
+`events.jsonl` is written by hooks. `summary.md` is written by the agent after `finish`.
 
-## Compared to OMX
+## Status
 
-OMX ships 52 skills. Axon keeps 10 lifecycle skills and one workflow-authoring skill. Here's what was cut and why:
+Axon is early but usable.
 
-- **Deprecated skills** — dead code. Gone.
-- **Role prompts posing as skills** — prompts define agent behavior; skills define workflows. Separate concerns.
-- **Tool/utility commands** — `doctor`, `hud`, `cancel`, `skill` are CLI commands, not skills.
-- **Redundant planning layers** — `deep-interview` + `ralplan` + `plan` + `best-practice-research` collapse into `dream` / `brainstorm` + `write-plan`.
-- **Over-engineered execution** — `ralph` + `ultragoal` + `team` + `pipeline` + `autopilot` collapse into `implement` / `execute`.
-- **Triple quality gates** — `code-review` + `ultraqa` + `visual-verdict` collapse into `review` + `verify`.
+Implemented:
 
-## Inspiration
+- plugin manifest and GitHub marketplace installation
+- 10 lifecycle skills
+- workflow authoring with `create-hook`
+- root `workflow.md` scaffold
+- runtime hooks
+- skill history runs
+- finish-triggered summary requests
 
-- [obra/superpowers](https://github.com/obra/superpowers) — the skills methodology and format
-- [Yeachan-Heo/oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex) — what happens when you ship 52 skills
+Still evolving:
+
+- richer history summaries
+- more workflow-aware hook generation
+- optional workflow schema or parser
+- stronger installer and update tooling
 
 ## License
 
