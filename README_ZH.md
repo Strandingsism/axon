@@ -1,5 +1,24 @@
 # Axon
 
+<p align="center">
+  <img src="assets/axon-product.png" alt="Axon product visual" />
+  <br>
+  <em>让 Codex 遵循你的 workflow，而不是一条硬编码流程。</em>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/status-early%20usable-blue" alt="Status: early usable" />
+  <img src="https://img.shields.io/badge/Codex-plugin-black" alt="Codex plugin" />
+  <img src="https://img.shields.io/badge/workflow-user--owned-00AEEF" alt="User-owned workflow" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
+</p>
+
+<p align="center">
+  <strong>语言：</strong>
+  <a href="./README.md">English</a> ·
+  <a href="./README_ZH.md">中文</a>
+</p>
+
 Axon 是 Codex 的 workflow layer：用户拥有的 `workflow.md`、可组合的 skills、运行时 hooks，以及 workflow history。
 
 它让 coding agent 能以可重复的方式完成规划、执行、验证、审查和沉淀，而不是强迫所有项目进入同一套固定流水线。
@@ -135,7 +154,7 @@ Axon 仍然早期，但已经可用。
 - 更丰富的 history summaries
 - 更理解 workflow 的 hook 生成
 - 可选 workflow schema 或 parser
-- 更强的安装与更新工具
+- 更强的工具
 
 ## License
 

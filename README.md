@@ -1,5 +1,24 @@
 # Axon
 
+<p align="center">
+  <img src="assets/axon-product.png" alt="Axon product visual: an axon-like signal connecting workflow nodes" />
+  <br>
+  <em>Let Codex follow your workflow, not a hardcoded one.</em>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/status-early%20usable-blue" alt="Status: early usable" />
+  <img src="https://img.shields.io/badge/Codex-plugin-black" alt="Codex plugin" />
+  <img src="https://img.shields.io/badge/workflow-user--owned-00AEEF" alt="User-owned workflow" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
+</p>
+
+<p align="center">
+  <strong>Language:</strong>
+  <a href="./README.md">English</a> ·
+  <a href="./README_ZH.md">Chinese</a>
+</p>
+
 Axon is a workflow layer for Codex: user-owned `workflow.md`, composable skills, runtime hooks, and workflow history.
 
 It gives coding agents a repeatable way to plan, execute, verify, review, and remember work without forcing a single rigid pipeline.
