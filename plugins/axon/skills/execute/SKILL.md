@@ -28,7 +28,7 @@ If you didn't run the tests in this message and see `0 failing`, you're not done
 
 ## The Loop
 
-Hooks have reset `docs/tasks.json` and injected the task list into context. Create matching tasks in the Codex Task system. Update `docs/tasks.json` after each task completes.
+Hooks have reset `.axon/tasks.json` and injected the task list into context. Create matching tasks in the Codex Task system. Update `.axon/tasks.json` after each task completes.
 
 **Greenfield note**: If this project came from `dream` and the repo is empty, scaffold first — init, directory structure, config files, dependency manifest. The first task typically covers this.
 
@@ -51,7 +51,7 @@ Clean up. Remove duplication. Improve names. Do NOT add new behavior. Run tests 
 Check against the plan:
 
 - Does the implementation match the task specification?
-- Is every new public export registered in `docs/interface-registry.md`?
+- Is every new public export registered in `.axon/interface-registry.md`?
 - Does every registered interface have an implementation?
 - Are tests meaningful (behavior, not coverage-chasing)?
 - Is the linter clean?
@@ -60,7 +60,7 @@ Check against the plan:
 
 | Outcome | Action |
 |---------|--------|
-| All checks pass | Mark task done, update `docs/project-map.md`, next task |
+| All checks pass | Mark task done, update `.axon/project-map.md`, next task |
 | Issues found | Fix the issues, go back to step 1 for this task |
 | Same issue 3rd time | **Stop.** Report the pattern. Question the approach. |
 

@@ -27,7 +27,7 @@ For single-task plans or tightly coupled tasks that can't be split, use `execute
 
 ### 1. Load the Plan
 
-Read the plan file from `docs/plans/`. Extract every task with its full text. Interface registry and project map are injected by hooks — no need to read them manually.
+Read the plan file from `.axon/plans/`. Extract every task with its full text. Interface registry and project map are injected by hooks — no need to read them manually.
 
 Note:
 - The overall goal
@@ -35,9 +35,9 @@ Note:
 - Task dependencies (does Task 3 depend on Task 2?)
 - Registered interfaces (subagents must match these signatures)
 
-Hooks have reset `docs/tasks.json` and injected the task list into context. Create matching tasks in the Codex Task system. After each task completes, update its status in `docs/tasks.json` to `"done"`.
+Hooks have reset `.axon/tasks.json` and injected the task list into context. Create matching tasks in the Codex Task system. After each task completes, update its status in `.axon/tasks.json` to `"done"`.
 
-Update `docs/project-map.md`: mark the `implement` phase as started.
+Update `.axon/project-map.md`: mark the `implement` phase as started.
 
 **Greenfield note**: If this project came from `dream` and the repo is empty, set up the project scaffold first — `init`, directory structure, config files, dependency manifest. The plan's first task typically covers this.
 
@@ -94,7 +94,7 @@ If the code quality reviewer finds issues:
 
 #### 2.5 Mark Complete
 
-After both reviews pass, mark the task complete. Update `docs/project-map.md`:
+After both reviews pass, mark the task complete. Update `.axon/project-map.md`:
 - Check the task checkbox
 - Add created/modified files to the Files section
 - If the file exceeds 100 lines, compress it — merge redundant entries, drop completed-task detail older than 2 phases, keep only the current state

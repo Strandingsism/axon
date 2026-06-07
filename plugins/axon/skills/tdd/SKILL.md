@@ -29,7 +29,7 @@ By default, write TDD tests and supporting test fixtures in the target project's
 
 This skill directory (`axon/skills/tdd/`) contains the workflow instructions only. It is not where project test code goes.
 
-Use the target project's existing test location only when the user, plan, or repository convention explicitly requires it. If you do, record the chosen path in `docs/project-map.md` and make the task plan name the exact test file.
+Use the target project's existing test location only when the user, plan, or repository convention explicitly requires it. If you do, record the chosen path in `.axon/project-map.md` and make the task plan name the exact test file.
 
 ## The Cycle
 

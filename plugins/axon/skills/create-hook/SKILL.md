@@ -28,7 +28,7 @@ Default to project-local hooks:
 .codex/hooks.json
 .codex/hooks/<hook-name>.mjs
 tdd/hooks/<hook-name>.test.mjs
-docs/hooks/<hook-name>.md
+.axon/hooks/<hook-name>.md
 ```
 
 Use another scope only when the user explicitly asks:
@@ -50,12 +50,12 @@ Read the relevant project docs before asking hook API questions or writing code.
 workflow.md
 AGENTS.md
 README.md
-docs/project-map.md
-docs/interface-registry.md
-docs/tasks.json
-docs/specs/*.md
-docs/plans/*.md
-docs/hooks/*.md
+.axon/project-map.md
+.axon/interface-registry.md
+.axon/tasks.json
+.axon/specs/*.md
+.axon/plans/*.md
+.axon/hooks/*.md
 .axon/state.json
 .codex/hooks.json
 ```
@@ -123,7 +123,7 @@ workflow rule -> source doc -> source of truth -> possible hook point
 Example:
 
 ```text
-Public APIs must be registered -> docs/interface-registry.md -> registry file -> PostToolUse Write|Edit audit
+Public APIs must be registered -> .axon/interface-registry.md -> registry file -> PostToolUse Write|Edit audit
 ```
 
 ### 2. Infer the Hook Intent
@@ -138,14 +138,14 @@ Translate the user's request into:
 - Output behavior
 - Failure behavior
 
-Prefer docs-derived behavior over generic templates. If the project already has `docs/tasks.json`, `docs/project-map.md`, or `docs/interface-registry.md`, make the hook understand those files by name.
+Prefer docs-derived behavior over generic templates. If the project already has `.axon/tasks.json`, `.axon/project-map.md`, or `.axon/interface-registry.md`, make the hook understand those files by name.
 
 ### 3. Confirm the Behavior
 
 Confirm the design using user-facing language:
 
 ```text
-I will create a non-blocking hook that runs after Write/Edit. It will read docs/interface-registry.md and inject a short reminder when source files changed, without blocking the edit.
+I will create a non-blocking hook that runs after Write/Edit. It will read .axon/interface-registry.md and inject a short reminder when source files changed, without blocking the edit.
 ```
 
 Ask one question only if needed. Good questions:
@@ -261,7 +261,7 @@ Merge with existing hooks. Do not overwrite unrelated hook groups.
 Create:
 
 ```text
-docs/hooks/<hook-name>.md
+.axon/hooks/<hook-name>.md
 ```
 
 Document:
@@ -303,5 +303,5 @@ After verification, tell the user:
 **Uses**: `tdd` for hook tests, `verify` before completion.
 **Reads**: project workflow docs before implementation.
 **Primary workflow doc**: root-level `workflow.md`.
-**Related docs**: `docs/hooks/<hook-name>.md`.
+**Related docs**: `.axon/hooks/<hook-name>.md`.
 **Does not replace**: lifecycle skills. This is project-aware workflow authoring, not implementation execution.

@@ -15,9 +15,9 @@ Axon strips the multi-agent orchestration concept down to its essence: a clean d
 
 | # | Skill | When | Output |
 |---|-------|------|--------|
-| 1 | `dream` | Greenfield project from scratch | `docs/specs/YYYY-MM-DD-<topic>-design.md` |
-| 2 | `brainstorm` | Brownfield work in an existing codebase | `docs/specs/YYYY-MM-DD-<topic>-design.md` |
-| 3 | `write-plan` | After an approved design | `docs/plans/YYYY-MM-DD-<feature>-plan.md` |
+| 1 | `dream` | Greenfield project from scratch | `.axon/specs/YYYY-MM-DD-<topic>-design.md` |
+| 2 | `brainstorm` | Brownfield work in an existing codebase | `.axon/specs/YYYY-MM-DD-<topic>-design.md` |
+| 3 | `write-plan` | After an approved design | `.axon/plans/YYYY-MM-DD-<feature>-plan.md` |
 | 4 | `implement` | Multi-task plan, subagent execution | Working, tested, reviewed code |
 | 5 | `execute` | Single-task plan, inline execution | Working, tested, verified code |
 | 6 | `tdd` | During implementation of any feature or fix | Tests that fail first, then pass |
@@ -30,7 +30,7 @@ Axon strips the multi-agent orchestration concept down to its essence: a clean d
 
 | Skill | When | Output |
 |-------|------|--------|
-| `create-hook` | User wants to customize Codex workflow automation | Project-local `.codex/hooks.json`, hook script, TDD fixture, and docs |
+| `create-hook` | User wants to customize Codex workflow automation | Project-local `.codex/hooks.json`, hook script, TDD fixture, and `.axon/hooks` documentation |
 
 `create-hook` is not part of the lifecycle chain. It creates tested Codex hooks for project-specific workflow automation.
 
@@ -61,7 +61,7 @@ axon/
 │       │   └── plugin.json    # Plugin manifest
 │       ├── skills/            # Lifecycle and workflow-authoring skills
 │       ├── hooks/             # Lifecycle hooks
-│       ├── docs/              # Bundled workflow examples/templates
+│       ├── .axon/             # Bundled Axon workflow examples/templates
 │       └── templates/         # AGENTS.md and bootstrapping templates
 └── README.md
 ```

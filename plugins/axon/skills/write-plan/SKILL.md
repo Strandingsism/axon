@@ -27,7 +27,7 @@ Skip when the task is a single-file, single-function change with no architectura
 
 ### 1. Load and Understand the Design
 
-Read the design document from `docs/specs/`. If anything is unclear or contradictory, resolve it with the user before writing the plan. Do not "interpret" ambiguity — ask.
+Read the design document from `.axon/specs/`. If anything is unclear or contradictory, resolve it with the user before writing the plan. Do not "interpret" ambiguity — ask.
 
 ### 2. Scope Check
 
@@ -55,7 +55,7 @@ Files should have one clear responsibility. Smaller, focused files beat large on
 
 ### 4. Declare Interfaces
 
-Before writing task details, declare every new public API in `docs/interface-registry.md`:
+Before writing task details, declare every new public API in `.axon/interface-registry.md`:
 
 ```markdown
 ## Auth Module
@@ -129,11 +129,11 @@ Each step is one atomic action. Write the test → run it → see it fail → wr
 
 ### 5.5. Write tasks.json
 
-After defining all tasks, write `docs/tasks.json` with the task list. This is the machine-readable manifest that hooks read to track progress and detect completion.
+After defining all tasks, write `.axon/tasks.json` with the task list. This is the machine-readable manifest that hooks read to track progress and detect completion.
 
 ```json
 {
-  "planFile": "docs/plans/YYYY-MM-DD-<topic>-plan.md",
+  "planFile": ".axon/plans/YYYY-MM-DD-<topic>-plan.md",
   "tasks": [
     { "id": 1, "name": "Write TokenStore with set/get", "status": "pending" },
     { "id": 2, "name": "Integrate login flow", "status": "pending" }
@@ -175,18 +175,18 @@ Fix issues inline.
 
 Present the plan for approval:
 
-> I've written the implementation plan at `docs/plans/2026-06-05-token-store-plan.md`. It has N tasks covering:
+> I've written the implementation plan at `.axon/plans/2026-06-05-token-store-plan.md`. It has N tasks covering:
 > - Task 1-2: Core implementation
 > - Task 3: Integration
 > - Task 4: Cleanup
 >
-> Interfaces are registered in `docs/interface-registry.md`. Please review. Once approved, I'll invoke `implement` to execute it.
+> Interfaces are registered in `.axon/interface-registry.md`. Please review. Once approved, I'll invoke `implement` to execute it.
 
 The user must explicitly approve before you proceed to `implement`.
 
 ### 9. Update Project Map
 
-After user approval, update `docs/project-map.md`:
+After user approval, update `.axon/project-map.md`:
 - Mark `2. write-plan` as done with the plan doc path
 - List the task stubs under `3. implement`
 

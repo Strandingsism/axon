@@ -67,7 +67,7 @@ Skip when:
 - Building from scratch → use `dream` instead
 - The task is purely mechanical (typo fix, version bump, exact string replacement)
 - The user provides a complete, unambiguous spec and explicitly says "just implement this"
-- You're working from an existing, approved design document in `docs/specs/`
+- You're working from an existing, approved design document in `.axon/specs/`
 
 ### write-plan — After an approved design
 
@@ -212,7 +212,7 @@ Shell commands are for running tests, builds, git operations, and commands that 
 
 ## Shared Documents
 
-### `docs/interface-registry.md` — Interface Contract
+### `.axon/interface-registry.md` — Interface Contract
 
 Hooks inject this document when `implement` or `review` is invoked. If you're the main agent, you already have it in context — no need to Read it. Subagents do not receive hook injections and must read it manually.
 
@@ -220,7 +220,7 @@ Hooks inject this document when `implement` or `review` is invoked. If you're th
 - Registered but not implemented → incomplete
 - Implemented but not registered → scope creep
 
-### `docs/project-map.md` — Global Map
+### `.axon/project-map.md` — Global Map
 
 Hooks inject this document when `implement`, `review`, or `finish` is invoked. Same rule: main agent has it, subagents must read manually.
 

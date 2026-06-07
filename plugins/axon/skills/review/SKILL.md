@@ -32,7 +32,7 @@ Review early, review often. A second pair of eyes catches what the implementer m
 - Nothing was built that wasn't specified (scope creep)
 - Edge cases mentioned in the design are handled
 - Error cases described in the plan are covered
-- **Every public export has a matching entry in `docs/interface-registry.md`** — unregistered exports are scope creep
+- **Every public export has a matching entry in `.axon/interface-registry.md`** — unregistered exports are scope creep
 - **Every registered interface is implemented** — registered but missing = incomplete
 
 If spec compliance fails, **do not proceed to Stage 2.** The implementer must fix gaps first. Code can be beautiful and completely wrong. Spec compliance first, always.
@@ -82,7 +82,7 @@ Read the plan/spec first. Then read the diff. Check every requirement. A diff th
 ### 3. Leave Actionable Feedback
 
 Bad: "This is wrong."
-Good: "`TokenStore.get` returns `undefined` for missing users, but the spec says it should throw `UserNotFoundError`. See `docs/specs/auth-design.md` line 42."
+Good: "`TokenStore.get` returns `undefined` for missing users, but the spec says it should throw `UserNotFoundError`. See `.axon/specs/auth-design.md` line 42."
 
 Bad: "Refactor this."
 Good: "`validateEmail` and `validatePassword` share the same regex-splitting logic (lines 15-22 and 34-41). Extract a shared `splitAndValidate` helper."
@@ -110,7 +110,7 @@ Before marking a review complete:
 
 If you believe a review finding is incorrect, push back with evidence — not argument:
 
-Good: "The reviewer says `TokenStore.get` should throw, but the spec at `docs/specs/auth-design.md:42` says 'returns undefined for missing users'. The implementation matches the spec."
+Good: "The reviewer says `TokenStore.get` should throw, but the spec at `.axon/specs/auth-design.md:42` says 'returns undefined for missing users'. The implementation matches the spec."
 
 Bad: "I think returning undefined is fine actually."
 

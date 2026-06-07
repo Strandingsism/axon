@@ -7,7 +7,7 @@ import { resolve } from 'node:path';
 const AXON_SKILLS = ['implement', 'execute', 'review', 'finish'];
 const CWD = process.cwd();
 const STATE_FILE = resolve(CWD, '.axon', 'state.json');
-const TASKS_FILE = resolve(CWD, 'docs', 'tasks.json');
+const TASKS_FILE = resolve(CWD, '.axon', 'tasks.json');
 
 // skill → state (one-way recording, no transition validation)
 const STATE_MAP = {
@@ -51,16 +51,16 @@ function resetTasksJson() {
 function buildSkillPrompt(skillName, tasksObj) {
   const mode = skillName === 'implement' ? 'subagent-driven' : 'inline';
   const taskNote = tasksObj?.tasks?.length
-    ? '\n- docs/tasks.json has been reset to pending; read it and mirror those tasks in the Codex task system.'
+    ? '\n- .axon/tasks.json has been reset to pending; read it and mirror those tasks in the Codex task system.'
     : '';
 
   return `Axon skill gate: ${skillName} (${mode}).
 
 Before using this skill:
 - Re-check AGENTS.md and relevant docs if the task context is unclear.
-- Use docs/project-map.md for project orientation.
-- Use docs/interface-registry.md for public interfaces and contracts.
-- Use docs/tasks.json for current task progress if it exists.
+- Use .axon/project-map.md for project orientation.
+- Use .axon/interface-registry.md for public interfaces and contracts.
+- Use .axon/tasks.json for current task progress if it exists.
 - Keep TDD coupled to implementation; default new TDD artifacts to tdd/.${taskNote}
 - Verify before claiming completion.${loadStateBlock()}`;
 }

@@ -14,7 +14,7 @@ You will receive:
 
 ### You MUST
 
-- **Before writing any code**: Read `docs/interface-registry.md`. Register every public export you plan to create (function signatures, class APIs, type exports) in the registry. Write the registry entries FIRST, then implement to match them.
+- **Before writing any code**: Read `.axon/interface-registry.md`. Register every public export you plan to create (function signatures, class APIs, type exports) in the registry. Write the registry entries FIRST, then implement to match them.
 - Follow `tdd` (test-driven development): write the failing test first, watch it fail, then implement
 - Match the plan's code blocks exactly — they were reviewed for correctness
 - Run every verification command the plan specifies
@@ -29,7 +29,7 @@ You will receive:
 - Change the plan's architecture or approach without explicit permission
 - Leave "TODO" or placeholder comments in your code
 - Proceed if a verification command fails
-- Create a public export that isn't registered in `docs/interface-registry.md`
+- Create a public export that isn't registered in `.axon/interface-registry.md`
 
 ### If You're Stuck
 

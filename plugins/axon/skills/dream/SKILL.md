@@ -78,7 +78,7 @@ One `AskUserQuestion` call per area. Don't dump all 4 at once. Wait for each ans
 
 ### 5. Write the Design Document
 
-Save to `docs/specs/YYYY-MM-DD-<topic>-design.md`:
+Save to `.axon/specs/YYYY-MM-DD-<topic>-design.md`:
 
 - **Vision**: One sentence — what and why
 - **Scope**: v0.1 must-haves, explicitly deferred
@@ -98,13 +98,13 @@ Save to `docs/specs/YYYY-MM-DD-<topic>-design.md`:
 
 The user must explicitly approve the design doc before you proceed:
 
-> I've written the design at `docs/specs/2026-06-06-<topic>-design.md`. Please review. Once approved, I'll invoke `write-plan`.
+> I've written the design at `.axon/specs/2026-06-06-<topic>-design.md`. Please review. Once approved, I'll invoke `write-plan`.
 
 Do NOT invoke `write-plan` until the user confirms.
 
 ### 8. Update Project Map
 
-Initialize `docs/project-map.md`: set the Goal, mark phase 1 done.
+Initialize `.axon/project-map.md`: set the Goal, mark phase 1 done.
 
 ### 9. Handoff
 
@@ -129,4 +129,4 @@ Always go to `write-plan` next. Never jump from dream to code.
 **Alternative to**: `brainstorm` (dream = greenfield, brainstorm = brownfield)
 **Hands off to**: `write-plan`
 **Uses**: `AskUserQuestion` (primary interaction tool)
-**Writes to**: `docs/project-map.md` (initialize)
+**Writes to**: `.axon/project-map.md` (initialize)
