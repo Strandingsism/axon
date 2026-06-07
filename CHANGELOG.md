@@ -1,0 +1,45 @@
+# Changelog
+
+All notable changes to Axon will be documented in this file.
+
+This project follows a pragmatic version history. Versions refer to the Codex plugin version in `plugins/axon/.codex-plugin/plugin.json`.
+
+## [0.1.13] - 2026-06-07
+
+### Added
+
+- GitHub marketplace installation flow.
+- Public README with product visual and Chinese translation.
+- 10 lifecycle skills:
+  - `dream`
+  - `brainstorm`
+  - `write-plan`
+  - `implement`
+  - `execute`
+  - `tdd`
+  - `debug`
+  - `review`
+  - `finish`
+  - `verify`
+- `create-hook` workflow authoring skill.
+- Root-level `workflow.md` scaffold as the user-owned agent behavior protocol.
+- Runtime hooks for session orientation, skill context preparation, task progress checks, and workflow history.
+- `.axon/history` run tracking:
+  - `index.json`
+  - `active.json`
+  - `runs/<run-id>/events.jsonl`
+  - finish-triggered `summary.md` requests
+
+### Changed
+
+- Removed the legacy `.axon/state.json` marker design.
+- Replaced state tracking hooks with skill history recording.
+- Moved generated workflow artifacts toward `.axon`.
+- Reworked README into a public GitHub release page.
+
+### Removed
+
+- HUD and pane management direction.
+- Legacy `update-state.mjs` and `check-finish.mjs` hooks.
+
+[0.1.13]: https://github.com/Strandingsism/axon/releases/tag/v0.1.13
