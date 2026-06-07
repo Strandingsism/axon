@@ -66,6 +66,20 @@ axon/
 └── README.md
 ```
 
+Runtime history is written by hooks inside target projects:
+
+```
+.axon/history/
+├── index.json
+├── active.json
+└── runs/
+    └── YYYY-MM-DD-001/
+        ├── events.jsonl
+        └── summary.md
+```
+
+Skill calls start or append to the active run. `finish` closes the run and asks the agent to write `summary.md`.
+
 ## Compared to OMX
 
 OMX ships 52 skills. Axon keeps 10 lifecycle skills and one workflow-authoring skill. Here's what was cut and why:

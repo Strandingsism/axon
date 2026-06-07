@@ -238,4 +238,12 @@ Hooks inject this document when `implement`, `review`, or `finish` is invoked. S
 - **Update after every phase** — the main agent writes to it directly
 - Max 100 lines — compress if exceeded (merge redundant entries, drop detail older than 2 phases)
 
+### `.axon/history/` — Workflow History
+
+Hooks append skill events to `.axon/history/runs/<run-id>/events.jsonl`.
+
+- The first Axon skill call starts a run when none is open.
+- `finish` closes the active run.
+- After `finish`, write the requested summary to `.axon/history/runs/<run-id>/summary.md`.
+
 The codebase is the source of truth. Git history is the audit trail. Tests are the quality evidence.

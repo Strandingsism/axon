@@ -56,6 +56,9 @@ README.md
 .axon/specs/*.md
 .axon/plans/*.md
 .axon/hooks/*.md
+.axon/history/index.json
+.axon/history/active.json
+.axon/history/runs/*/events.jsonl
 .codex/hooks.json
 ```
 
