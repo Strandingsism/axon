@@ -1,6 +1,6 @@
 {
   "name": "axon",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Lean development methodology: 10 lifecycle skills plus workflow authoring.",
   "author": {
     "name": "Axon"
@@ -12,7 +12,7 @@
   "interface": {
     "displayName": "Axon",
     "shortDescription": "Lean dev methodology: dream/brainstorm → plan → implement/execute → review → finish",
-    "longDescription": "A focused development methodology plugin. 10 composable lifecycle skills cover dream (greenfield ideation), brainstorm (brownfield design), write-plan (bite-sized tasks), implement (subagent execution with two-stage review), execute (inline single-task execution), tdd (test-first), debug (systematic 4-phase), review (spec compliance + code quality), finish (clean branch completion), and verify (evidence before claims). create-hook adds workflow authoring for project-local Codex hook automation.",
+    "longDescription": "A focused development methodology plugin. 10 composable lifecycle skills cover dream (greenfield ideation), brainstorm (brownfield design), write-plan (bite-sized tasks), implement (subagent execution with two-stage review), execute (inline single-task execution), tdd (test-first), debug (systematic 4-phase), review (spec compliance + code quality), finish (clean branch completion), and verify (evidence before claims). create-hook adds docs-aware workflow authoring for project-local Codex hook automation.",
     "developerName": "Axon",
     "category": "Developer Tools",
     "capabilities": ["Read", "Write", "Edit", "Bash"]

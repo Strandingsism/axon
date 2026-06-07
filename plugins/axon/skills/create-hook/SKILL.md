@@ -1,17 +1,24 @@
 ---
 name: create-hook
-description: "Use when the user wants to create, modify, or document Codex hooks for a custom workflow."
+description: "Use when the user wants to create, modify, or document project-aware Codex hooks for a custom workflow."
 ---
 
 # Create Hook
 
-Create project-local Codex hooks that turn a user's workflow into runtime automation. A hook is code with operational impact, so design it, test it, register it, and document it.
+Create project-aware Codex hooks that turn a user's documented workflow into runtime automation. The input is not only the user's sentence. The input is the target project's docs, rules, current workflow state, and existing hook setup.
 
 ## Hard Gate
 
-**NO HOOK WITHOUT AN EXPLICIT SCOPE AND A TEST.**
+**NO HOOK WITHOUT PROJECT CONTEXT, AN EXPLICIT SCOPE, AND A TEST.**
 
-Before writing or editing any hook, identify where it will live and write a minimal test or fixture that proves the hook input/output contract.
+Before writing or editing any hook:
+
+1. Read the project's workflow docs.
+2. Infer the workflow rule behind the user's request.
+3. Confirm the behavior in user-facing workflow language.
+4. Write a minimal test or fixture that proves the hook input/output contract.
+
+Do not start by asking the user for Codex hook internals such as `PreToolUse` or `PostToolUse`. Translate workflow intent into hook mechanics yourself.
 
 ## Default Scope
 
@@ -35,9 +42,57 @@ Use another scope only when the user explicitly asks:
 
 Do not edit an installed plugin cache unless the user explicitly requests it and understands that upgrades may replace the change.
 
+## Project Context
+
+Read the relevant project docs before asking hook API questions or writing code. Prefer these sources, if they exist:
+
+```text
+AGENTS.md
+README.md
+docs/project-map.md
+docs/interface-registry.md
+docs/tasks.json
+docs/specs/*.md
+docs/plans/*.md
+docs/hooks/*.md
+.axon/workflow.md
+.axon/state.json
+.codex/hooks.json
+```
+
+Summarize the project workflow in your own notes:
+
+- Current phases and task flow
+- State files and source-of-truth docs
+- Interface or API boundaries that need protection
+- TDD expectations and test locations
+- Existing hooks and their events
+- Rules that should prompt, sync, audit, or gate
+
+If docs conflict with the user's request, surface the conflict before writing. Example: "The docs say public APIs must be registered, but the requested hook only reminds after review. Should this check happen after file edits instead?"
+
+## Workflow Intent
+
+Ask the user in workflow language first:
+
+| User-facing intent | Likely event | Likely hook type |
+|--------------------|--------------|------------------|
+| Before starting a session, remind the agent what to read | `SessionStart` | prompt |
+| Before using a tool, check a rule | `PreToolUse` | audit or gate |
+| After writing files, sync docs or task state | `PostToolUse` | sync |
+| After a skill completes, advance workflow state | `PostToolUse` | state |
+| Before risky operations, require confirmation | `PermissionRequest` or `PreToolUse` | gate |
+| When the agent is about to stop, check completion | `Stop` | audit |
+
+Only expose event and matcher details when:
+
+- The user asks for them
+- Multiple valid implementations exist
+- The choice changes safety or user experience
+
 ## Hook Types
 
-Choose the smallest hook type that fits:
+Choose the smallest hook type that fits the project docs:
 
 | Type | Behavior | Default decision |
 |------|----------|------------------|
@@ -47,23 +102,60 @@ Choose the smallest hook type that fits:
 | audit | Read-only check that reports a short reminder | `allow` |
 | gate | Block or require confirmation for risky actions | explicit user approval required |
 
-Default hooks should not block. Use `gate` only when the user asks for enforcement.
+Default hooks should not block. Use `gate` only when the user asks for enforcement or the docs explicitly define a hard gate.
 
 ## Process
 
-### 1. Clarify the Workflow
+### 1. Read Project Workflow Context
 
-Ask one question at a time until these are known:
+Inspect the docs listed in **Project Context**. Do not bulk-read unrelated source files unless the hook rule depends on them.
 
-- Scope: project-local, user-global, plugin-bundled, or installed-plugin
-- Event: `SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PermissionRequest`, `PostToolUse`, `Stop`, or `SubagentStop`
-- Matcher: event-specific matcher, if any
-- Type: prompt, state, sync, audit, or gate
-- Output: no context, short `additionalContext`, state write, or block reason
+Produce a short internal mapping:
 
-If the user has no preference, use project-local scope, non-blocking behavior, and short prompt/state output.
+```text
+workflow rule -> source doc -> source of truth -> possible hook point
+```
 
-### 2. Design the Contract
+Example:
+
+```text
+Public APIs must be registered -> docs/interface-registry.md -> registry file -> PostToolUse Write|Edit audit
+```
+
+### 2. Infer the Hook Intent
+
+Translate the user's request into:
+
+- Workflow rule
+- Trigger moment in normal language
+- Event and matcher
+- Hook type
+- Files read and written
+- Output behavior
+- Failure behavior
+
+Prefer docs-derived behavior over generic templates. If the project already has `docs/tasks.json`, `docs/project-map.md`, or `docs/interface-registry.md`, make the hook understand those files by name.
+
+### 3. Confirm the Behavior
+
+Confirm the design using user-facing language:
+
+```text
+I will create a non-blocking hook that runs after Write/Edit. It will read docs/interface-registry.md and inject a short reminder when source files changed, without blocking the edit.
+```
+
+Ask one question only if needed. Good questions:
+
+- "Should this be a reminder or a blocking gate?"
+- "Should this apply only to source files or to all writes?"
+- "Should this update docs automatically or only prompt the agent?"
+
+Avoid asking:
+
+- "Which Codex event should I use?"
+- "What matcher do you want?"
+
+### 4. Design the Contract
 
 Record the expected stdin payload and stdout response before writing implementation.
 
@@ -71,9 +163,11 @@ For tool hooks, include:
 
 ```json
 {
-  "hook_event_name": "PreToolUse",
+  "hook_event_name": "PostToolUse",
   "tool_name": "Write",
-  "tool_input": {}
+  "tool_input": {
+    "file_path": "src/api.ts"
+  }
 }
 ```
 
@@ -85,9 +179,9 @@ For output, prefer:
 }
 ```
 
-Only include `hookSpecificOutput.additionalContext` when the hook must guide the agent. Keep it short.
+Only include `hookSpecificOutput.additionalContext` when the hook must guide the agent. Keep it short and project-specific.
 
-### 3. Write TDD First
+### 5. Write TDD First
 
 Create:
 
@@ -102,10 +196,11 @@ The test must:
 - Parse stdout as JSON
 - Assert `decision`, `hookSpecificOutput`, file writes, or block behavior
 - Cover malformed input and no-op input
+- Include fixtures for the relevant project docs when the hook depends on docs
 
 If the target repo already has a test runner, integrate with it. Otherwise, use a plain Node test file.
 
-### 4. Implement the Hook
+### 6. Implement the Hook
 
 Create:
 
@@ -123,8 +218,9 @@ Implementation requirements:
 - Do not inject long documents
 - Use stable paths based on `process.cwd()` for project-local hooks
 - Use `PLUGIN_ROOT` only for plugin-bundled hooks
+- Treat docs as source-of-truth inputs, not as optional decoration
 
-### 5. Register the Hook
+### 7. Register the Hook
 
 Update:
 
@@ -137,15 +233,15 @@ Include both `command` and `commandWindows`:
 ```json
 {
   "hooks": {
-    "PreToolUse": [
+    "PostToolUse": [
       {
         "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "node .codex/hooks/example.mjs",
-            "commandWindows": "node .codex/hooks/example.mjs",
-            "statusMessage": "Workflow: checking write"
+            "command": "node .codex/hooks/interface-registry-audit.mjs",
+            "commandWindows": "node .codex/hooks/interface-registry-audit.mjs",
+            "statusMessage": "Workflow: checking interface registry"
           }
         ]
       }
@@ -156,7 +252,7 @@ Include both `command` and `commandWindows`:
 
 Merge with existing hooks. Do not overwrite unrelated hook groups.
 
-### 6. Document the Hook
+### 8. Document the Hook
 
 Create:
 
@@ -167,6 +263,7 @@ docs/hooks/<hook-name>.md
 Document:
 
 - Purpose
+- Source docs used to derive the rule
 - Scope and paths
 - Event and matcher
 - Input payload shape
@@ -175,12 +272,13 @@ Document:
 - How to test
 - How to trust or disable it with `/hooks`
 
-### 7. Verify
+### 9. Verify
 
 Run the hook test and a direct stdin smoke test. Read the output before claiming success.
 
 After verification, tell the user:
 
+- Which docs shaped the hook behavior
 - Which files changed
 - Whether the hook is blocking or non-blocking
 - Whether `/hooks` trust is required
@@ -194,9 +292,11 @@ After verification, tell the user:
 - Do not write outside the selected scope.
 - Do not silently modify global hooks when project-local hooks would work.
 - Do not rely on installed plugin cache as source of truth.
+- Do not ignore project docs when they define workflow rules.
 
 ## Integration
 
 **Uses**: `tdd` for hook tests, `verify` before completion.
+**Reads**: project workflow docs before implementation.
 **Related docs**: `docs/hooks/<hook-name>.md`.
-**Does not replace**: lifecycle skills. This is workflow authoring, not implementation execution.
+**Does not replace**: lifecycle skills. This is project-aware workflow authoring, not implementation execution.
