@@ -47,6 +47,7 @@ Do not edit an installed plugin cache unless the user explicitly requests it and
 Read the relevant project docs before asking hook API questions or writing code. Prefer these sources, if they exist:
 
 ```text
+workflow.md
 AGENTS.md
 README.md
 docs/project-map.md
@@ -55,10 +56,13 @@ docs/tasks.json
 docs/specs/*.md
 docs/plans/*.md
 docs/hooks/*.md
-.axon/workflow.md
 .axon/state.json
 .codex/hooks.json
 ```
+
+`workflow.md` is the canonical user-owned workflow file. Its default location is the project root only. Do not create or assume `.axon/workflow.md`, `docs/workflow.md`, or any nested workflow file unless the user explicitly points to one.
+
+Axon may create a root-level `workflow.md` structure placeholder only when the user asks for one. The content belongs to the user. Do not fill it with Axon policy beyond neutral section headings and brief placeholder prompts.
 
 Summarize the project workflow in your own notes:
 
@@ -298,5 +302,6 @@ After verification, tell the user:
 
 **Uses**: `tdd` for hook tests, `verify` before completion.
 **Reads**: project workflow docs before implementation.
+**Primary workflow doc**: root-level `workflow.md`.
 **Related docs**: `docs/hooks/<hook-name>.md`.
 **Does not replace**: lifecycle skills. This is project-aware workflow authoring, not implementation execution.

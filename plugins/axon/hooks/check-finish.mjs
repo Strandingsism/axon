@@ -5,6 +5,13 @@ import { resolve } from 'node:path';
 const CWD = process.cwd();
 const STATE_FILE = resolve(CWD, '.axon', 'state.json');
 
+function exitOk() {
+  process.exit(0);
+}
+
+process.on('uncaughtException', exitOk);
+process.on('unhandledRejection', exitOk);
+
 function loadState() {
   try {
     if (!existsSync(STATE_FILE)) return { state: 'idle', updatedAt: null };
@@ -32,12 +39,11 @@ function readStdin() {
 const payload = await readStdin();
 
 if (!payload || payload.tool_name !== 'Skill' || payload.tool_input?.skill !== 'finish') {
-  process.stdout.write(JSON.stringify({ decision: 'allow' }));
-  process.exit(0);
+  exitOk();
 }
 
 // finish skill completed → mark done
 const current = loadState();
 if (current.state === 'finishing') saveState('done');
 
-process.stdout.write(JSON.stringify({ decision: 'allow' }));
+exitOk();

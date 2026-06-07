@@ -10,6 +10,13 @@ const TASKS_FILE = resolve(CWD, 'docs', 'tasks.json');
 
 // --- main ---
 
+function exitOk() {
+  process.exit(0);
+}
+
+process.on('uncaughtException', exitOk);
+process.on('unhandledRejection', exitOk);
+
 function readStdin() {
   return new Promise((resolve) => {
     let data = '';
@@ -24,39 +31,33 @@ const payload = await readStdin();
 
 // Only care about Write or Edit on tasks.json
 if (!payload || !['Write', 'Edit'].includes(payload.tool_name)) {
-  process.stdout.write(JSON.stringify({ decision: 'allow' }));
-  process.exit(0);
+  exitOk();
 }
 
 const filePath = payload.tool_input?.file_path || '';
 if (basename(filePath) !== 'tasks.json') {
-  process.stdout.write(JSON.stringify({ decision: 'allow' }));
-  process.exit(0);
+  exitOk();
 }
 
 // Read tasks.json
 let tasksObj;
 try {
   if (!existsSync(TASKS_FILE)) {
-    process.stdout.write(JSON.stringify({ decision: 'allow' }));
-    process.exit(0);
+    exitOk();
   }
   tasksObj = JSON.parse(readFileSync(TASKS_FILE, 'utf-8'));
 } catch {
-  process.stdout.write(JSON.stringify({ decision: 'allow' }));
-  process.exit(0);
+  exitOk();
 }
 
 if (!tasksObj.tasks?.length) {
-  process.stdout.write(JSON.stringify({ decision: 'allow' }));
-  process.exit(0);
+  exitOk();
 }
 
 // Check completion
 const allDone = tasksObj.tasks.every(t => t.status === 'done');
 if (!allDone) {
-  process.stdout.write(JSON.stringify({ decision: 'allow' }));
-  process.exit(0);
+  exitOk();
 }
 
 // All done — inject the review prompt
@@ -70,7 +71,6 @@ const prompt = `## ALL TASKS COMPLETE (injected by Axon)
 Do NOT proceed to review without explicit user confirmation.`;
 
 process.stdout.write(JSON.stringify({
-  decision: 'allow',
   hookSpecificOutput: {
     hookEventName: 'PostToolUse',
     additionalContext: prompt,
