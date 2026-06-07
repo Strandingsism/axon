@@ -29,7 +29,8 @@ function loadStateBlock() {
   try {
     if (!existsSync(STATE_FILE)) return '';
     const stateJson = JSON.parse(readFileSync(STATE_FILE, 'utf-8'));
-    return `\n\nCurrent Axon state:\n\`\`\`json\n${JSON.stringify(stateJson, null, 2)}\n\`\`\``;
+    if (!stateJson.state || stateJson.state === 'idle') return '';
+    return `\n\nCurrent Axon state: ${stateJson.state}. Read .axon/state.json if exact state metadata is needed.`;
   } catch {
     return '';
   }

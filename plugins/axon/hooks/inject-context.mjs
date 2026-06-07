@@ -8,7 +8,7 @@ if (existsSync(stateFile)) {
   try {
     const stateJson = JSON.parse(readFileSync(stateFile, 'utf-8'));
     if (stateJson.state && stateJson.state !== 'idle') {
-      stateBlock = `\n\nCurrent Axon state:\n\`\`\`json\n${JSON.stringify(stateJson, null, 2)}\n\`\`\``;
+      stateBlock = `\n\nCurrent Axon state: ${stateJson.state}. Read .axon/state.json if exact state metadata is needed.`;
     }
   } catch {}
 }
