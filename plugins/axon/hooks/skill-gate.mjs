@@ -1,42 +1,12 @@
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-// PreToolUse hook — state recording + orientation prompt + tasks.json reset
+// PreToolUse hook — orientation prompt + tasks.json reset.
 // Never blocks. Only on Skill("implement") | Skill("execute") | Skill("review") | Skill("finish").
 
 const AXON_SKILLS = ['implement', 'execute', 'review', 'finish'];
 const CWD = process.cwd();
-const STATE_FILE = resolve(CWD, '.axon', 'state.json');
 const TASKS_FILE = resolve(CWD, '.axon', 'tasks.json');
-
-// skill → state (one-way recording, no transition validation)
-const STATE_MAP = {
-  implement: 'implementing',
-  execute:   'implementing',
-  review:    'reviewing',
-  finish:    'finishing',
-};
-
-// --- state helper ---
-
-function saveState(state) {
-  const dir = resolve(CWD, '.axon');
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-  writeFileSync(STATE_FILE, JSON.stringify({ state, updatedAt: new Date().toISOString() }, null, 2));
-}
-
-function loadStateBlock() {
-  try {
-    if (!existsSync(STATE_FILE)) return '';
-    const stateJson = JSON.parse(readFileSync(STATE_FILE, 'utf-8'));
-    if (!stateJson.state || stateJson.state === 'idle') return '';
-    return `\n\nCurrent Axon state: ${stateJson.state}. Read .axon/state.json if exact state metadata is needed.`;
-  } catch {
-    return '';
-  }
-}
-
-// --- tasks.json helpers ---
 
 function resetTasksJson() {
   try {
@@ -46,7 +16,9 @@ function resetTasksJson() {
     obj.tasks.forEach(t => t.status = 'pending');
     writeFileSync(TASKS_FILE, JSON.stringify(obj, null, 2));
     return obj;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 function buildSkillPrompt(skillName, tasksObj) {
@@ -63,17 +35,19 @@ Before using this skill:
 - Use .axon/interface-registry.md for public interfaces and contracts.
 - Use .axon/tasks.json for current task progress if it exists.
 - Keep TDD coupled to implementation; default new TDD artifacts to tdd/.${taskNote}
-- Verify before claiming completion.${loadStateBlock()}`;
+- Verify before claiming completion.`;
 }
 
-// --- main ---
-
 function readStdin() {
-  return new Promise((resolve) => {
+  return new Promise((resolvePayload) => {
     let data = '';
     process.stdin.on('data', chunk => data += chunk);
     process.stdin.on('end', () => {
-      try { resolve(JSON.parse(data)); } catch { resolve(null); }
+      try {
+        resolvePayload(JSON.parse(data));
+      } catch {
+        resolvePayload(null);
+      }
     });
   });
 }
@@ -91,11 +65,6 @@ if (!AXON_SKILLS.includes(skillName)) {
   process.exit(0);
 }
 
-// --- state ---
-const next = STATE_MAP[skillName];
-if (next) saveState(next);
-
-// --- tasks.json (implement/execute only) ---
 let tasksObj = null;
 if (skillName === 'implement' || skillName === 'execute') {
   tasksObj = resetTasksJson();

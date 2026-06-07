@@ -5,7 +5,7 @@ description: "Use when the user wants to create, modify, or document project-awa
 
 # Create Hook
 
-Create project-aware Codex hooks that turn a user's documented workflow into runtime automation. The input is not only the user's sentence. The input is the target project's docs, rules, current workflow state, and existing hook setup.
+Create project-aware Codex hooks that turn a user's documented workflow into runtime automation. The input is not only the user's sentence. The input is the target project's docs, rules, workflow context, and existing hook setup.
 
 ## Hard Gate
 
@@ -56,18 +56,37 @@ README.md
 .axon/specs/*.md
 .axon/plans/*.md
 .axon/hooks/*.md
-.axon/state.json
 .codex/hooks.json
 ```
 
 `workflow.md` is the canonical user-owned workflow file. Its default location is the project root only. Do not create or assume `.axon/workflow.md`, `docs/workflow.md`, or any nested workflow file unless the user explicitly points to one.
 
-Axon may create a root-level `workflow.md` structure placeholder only when the user asks for one. The content belongs to the user. Do not fill it with Axon policy beyond neutral section headings and brief placeholder prompts.
+Treat `workflow.md` as the project's agent behavior design system, not as a generic rule dump. When present, read these sections before designing a hook:
+
+- Operating Philosophy
+- Workflow Tokens
+- Workflow States
+- Task Classification
+- Default Protocol
+- Confirmation Gates
+- Tool Policy
+- Output Contract
+- Examples
+
+Infer hooks from the workflow protocol. For example, a confirmation gate should usually become a prompt or gate hook, while a workflow state should usually become a history entry or a short reminder.
+
+Axon may create a root-level `workflow.md` structure placeholder only when the user asks for one. The content belongs to the user. Do not fill it with Axon policy beyond neutral section headings, parseable token examples, and brief placeholder prompts.
 
 Summarize the project workflow in your own notes:
 
+- Operating philosophy and conflict-resolution principles
+- Workflow tokens that affect autonomy, planning, risk, testing, research, language, or report style
+- Current workflow states and state transitions
+- Task classes and their required protocols
+- Confirmation gates and restricted tool behavior
+- Output contracts
 - Current phases and task flow
-- State files and source-of-truth docs
+- Source-of-truth docs and runtime artifacts
 - Interface or API boundaries that need protection
 - TDD expectations and test locations
 - Existing hooks and their events
@@ -83,8 +102,8 @@ Ask the user in workflow language first:
 |--------------------|--------------|------------------|
 | Before starting a session, remind the agent what to read | `SessionStart` | prompt |
 | Before using a tool, check a rule | `PreToolUse` | audit or gate |
-| After writing files, sync docs or task state | `PostToolUse` | sync |
-| After a skill completes, advance workflow state | `PostToolUse` | state |
+| After writing files, sync docs or task progress | `PostToolUse` | sync |
+| After a skill completes, record workflow history | `PostToolUse` | history |
 | Before risky operations, require confirmation | `PermissionRequest` or `PreToolUse` | gate |
 | When the agent is about to stop, check completion | `Stop` | audit |
 
@@ -101,7 +120,7 @@ Choose the smallest hook type that fits the project docs:
 | Type | Behavior | Default decision |
 |------|----------|------------------|
 | prompt | Inject a short reminder with `additionalContext` | `allow` |
-| state | Record local workflow state such as `.axon/state.json` | `allow` |
+| history | Append local workflow events | `allow` |
 | sync | Keep docs, tasks, or maps aligned after file changes | `allow` |
 | audit | Read-only check that reports a short reminder | `allow` |
 | gate | Block or require confirmation for risky actions | explicit user approval required |
@@ -131,6 +150,7 @@ Public APIs must be registered -> .axon/interface-registry.md -> registry file -
 Translate the user's request into:
 
 - Workflow rule
+- Source `workflow.md` section, token, state, gate, or output contract
 - Trigger moment in normal language
 - Event and matcher
 - Hook type

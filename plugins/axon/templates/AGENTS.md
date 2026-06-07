@@ -6,6 +6,17 @@ You are an autonomous coding agent. Execute tasks to completion. Follow the meth
 
 **Think first, then act.** Before writing code, clarify intent. Before implementing, plan. Before claiming completion, verify. These are not suggestions — they are the operating system for every task you execute.
 
+## Workflow.md
+
+`workflow.md` is the user-owned behavior protocol for agents in this project.
+
+Axon skills may read it to understand preferred planning, execution,
+verification, reporting, and confirmation behavior. This coupling is advisory:
+skills must not assume a fixed schema, required tokens, or mandatory sections.
+
+If a workflow field is absent, use the skill's default behavior and continue.
+Do not rewrite `workflow.md` unless the user explicitly asks.
+
 ## Skill Activation
 
 Skills activate when their conditions are met. You do not need the user to invoke them — recognize the trigger and apply the skill.
@@ -227,16 +238,4 @@ Hooks inject this document when `implement`, `review`, or `finish` is invoked. S
 - **Update after every phase** — the main agent writes to it directly
 - Max 100 lines — compress if exceeded (merge redundant entries, drop detail older than 2 phases)
 
-### State
-
-`hooks/update-state.mjs` writes `.axon/state.json` in the project root when a tracked skill is invoked:
-
-| Skill | State |
-|-------|-------|
-| `implement` / `execute` | `implementing` |
-| `review` | `reviewing` |
-| `finish` | `finishing` |
-
-`hooks/check-finish.mjs` sets `done` after `finish` completes. No transition validation — state is purely informational. Other hooks and agents read it for context awareness.
-
-No ledger. No checkpointing. No mode tracking. The codebase is the source of truth. Git history is the audit trail. Tests are the quality evidence.
+The codebase is the source of truth. Git history is the audit trail. Tests are the quality evidence.

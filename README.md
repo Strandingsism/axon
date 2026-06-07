@@ -34,7 +34,7 @@ Axon strips the multi-agent orchestration concept down to its essence: a clean d
 
 `create-hook` is not part of the lifecycle chain. It creates tested Codex hooks for project-specific workflow automation.
 
-The canonical workflow file is the user's root-level `workflow.md`. Axon treats it as user-owned: it may provide structure placeholders when asked, but the workflow content is fully defined by the user.
+The canonical workflow file is the user's root-level `workflow.md`. Axon treats it as the project's agent behavior design system: a user-owned source of truth for operating philosophy, workflow tokens, task classes, states, confirmation gates, tool policy, and output contracts. Axon may provide structure placeholders when asked, but the workflow content is fully defined by the user.
 
 ## Flow
 
@@ -51,7 +51,7 @@ dream / brainstorm ──→ write-plan ──→ implement / execute ──→ 
 
 ```
 axon/
-├── workflow.md                   # User-owned workflow structure placeholder
+├── workflow.md                   # User-owned agent behavior design system
 ├── .agents/
 │   └── plugins/
 │       └── marketplace.json   # Codex marketplace entry
