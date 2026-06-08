@@ -4,6 +4,13 @@ All notable changes to Axon will be documented in this file.
 
 This project follows a pragmatic version history. Versions refer to the Codex plugin version in `plugins/axon/.codex-plugin/plugin.json`.
 
+## [0.1.18] - 2026-06-08
+
+### Changed
+
+- Apply concise skill context to every Axon skill except `brainstorm` and `dream`.
+- Add a short project-root `.axon/project-map.md` and `.axon/interface-registry.md` maintenance reminder to skill context.
+
 ## [0.1.17] - 2026-06-08
 
 ### Fixed

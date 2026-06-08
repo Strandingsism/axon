@@ -1,6 +1,6 @@
 {
   "name": "axon",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "User-owned workflow layer for Codex with composable skills, hooks, and history.",
   "author": {
     "name": "Axon"

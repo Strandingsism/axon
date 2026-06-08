@@ -1,7 +1,8 @@
+import { normalizeSkillName } from './history-core.mjs';
 import { prepareSkillContext } from './skill-context-core.mjs';
 
-// PreToolUse hook — orientation prompt + tasks.json reset.
-// Never blocks. Only on Skill("implement") | Skill("execute") | Skill("review") | Skill("finish").
+// PreToolUse hook: concise skill context plus optional tasks.json reset.
+// Never blocks.
 
 function readStdin() {
   return new Promise((resolvePayload) => {
@@ -24,7 +25,7 @@ if (!payload || payload.tool_name !== 'Skill') {
   process.exit(0);
 }
 
-const skillName = payload.tool_input?.skill;
+const skillName = normalizeSkillName(payload.tool_input?.skill);
 const additionalContext = prepareSkillContext(process.cwd(), skillName);
 if (!additionalContext) {
   process.stdout.write(JSON.stringify({ decision: 'allow' }));

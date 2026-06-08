@@ -1,8 +1,9 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
+import { AXON_SKILLS } from './history-core.mjs';
 import { axonPath } from './axon-root.mjs';
 
-const GATED_SKILLS = ['implement', 'execute', 'review', 'finish'];
+const CONTEXT_SKILLS = AXON_SKILLS.filter(skill => !['brainstorm', 'dream'].includes(skill));
 
 function tasksPath(cwd) {
   return axonPath(cwd, 'tasks.json');
@@ -22,27 +23,19 @@ export function resetTasksJson(cwd) {
 }
 
 export function buildSkillPrompt(skillName, tasksObj) {
-  const mode = skillName === 'implement' ? 'subagent-driven' : 'inline';
   const taskNote = tasksObj?.tasks?.length
-    ? '\n- The project-root .axon/tasks.json has been reset to pending; read it and mirror those tasks in the Codex task system.'
+    ? '\n- Reset project-root .axon/tasks.json to pending; mirror it in Codex tasks.'
     : '';
 
-  return `Axon skill context: ${skillName} (${mode}).
-
-Before using this skill:
-- Re-check AGENTS.md and relevant docs if the task context is unclear.
-- If workflow.md exists, follow its planning, confirmation, verification, and reporting preferences.
-- Treat all .axon/... paths as project-root-relative, not current-subdirectory-relative.
-- Use .axon/project-map.md for project orientation if it exists or workflow.md requires it.
-- Use .axon/interface-registry.md for public interfaces if it exists or workflow.md requires it.
-- Use .axon/tasks.json for task progress if it exists.
-- Keep TDD coupled to implementation; default new TDD artifacts to tdd/.${taskNote}
-- Do not force a fixed Axon lifecycle when the user has defined a different workflow.
-- Verify before claiming completion.`;
+  return `Axon skill context: ${skillName}.
+- Follow workflow.md when present; do not force a fixed Axon sequence.
+- Treat .axon/... as project-root-relative.
+- Keep project-root .axon/project-map.md and project-root .axon/interface-registry.md current when structure or public interfaces change.
+- Keep TDD artifacts in tdd/ unless project conventions say otherwise.${taskNote}`;
 }
 
 export function prepareSkillContext(cwd, skillName) {
-  if (!GATED_SKILLS.includes(skillName)) return null;
+  if (!CONTEXT_SKILLS.includes(skillName)) return null;
 
   const tasksObj = skillName === 'implement' || skillName === 'execute'
     ? resetTasksJson(cwd)
