@@ -4,6 +4,13 @@ All notable changes to Axon will be documented in this file.
 
 This project follows a pragmatic version history. Versions refer to the Codex plugin version in `plugins/axon/.codex-plugin/plugin.json`.
 
+## [0.1.14] - 2026-06-08
+
+### Fixed
+
+- Record explicit `$axon:<skill>` prompt invocations through a `UserPromptSubmit` hook.
+- Close explicit `$axon:finish` history runs through a `Stop` hook after the turn completes.
+
 ## [0.1.13] - 2026-06-07
 
 ### Added

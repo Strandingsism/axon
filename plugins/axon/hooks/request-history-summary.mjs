@@ -1,4 +1,5 @@
 import {
+  buildHistorySummaryPrompt,
   closeRunForFinish,
   normalizeSkillName,
   readHookPayload,
@@ -21,26 +22,10 @@ try {
     exitOk();
   }
 
-  const eventsPath = `${run.runDir}/events.jsonl`;
-  const summaryPath = run.summary;
-  const prompt = `Axon history run finished.
-
-Read \`${eventsPath}\` and write a detailed workflow summary to \`${summaryPath}\`.
-
-The summary should include:
-- Goal
-- Skill Sequence
-- What Happened
-- User Workflow Signals
-- Artifacts or files worth remembering
-- Follow-up
-
-Use the event log as evidence. Do not invent events that are not present.`;
-
   process.stdout.write(JSON.stringify({
     hookSpecificOutput: {
       hookEventName: 'PostToolUse',
-      additionalContext: prompt,
+      additionalContext: buildHistorySummaryPrompt(run),
     },
   }));
 } catch {

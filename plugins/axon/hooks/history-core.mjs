@@ -27,6 +27,20 @@ export function normalizeSkillName(value) {
   return AXON_SKILLS.includes(skill) ? skill : null;
 }
 
+export function extractExplicitAxonSkills(prompt) {
+  if (typeof prompt !== 'string') return [];
+
+  const skills = [];
+  const regex = /(^|[^\w:-])\$axon:([A-Za-z][A-Za-z0-9-]*)/g;
+
+  for (const match of prompt.matchAll(regex)) {
+    const skill = normalizeSkillName(match[2]);
+    if (skill) skills.push(skill);
+  }
+
+  return skills;
+}
+
 export function readHookPayload() {
   return new Promise((resolvePayload) => {
     let data = '';
@@ -126,7 +140,7 @@ function updateIndexRun(cwd, runId, patch) {
   writeJson(indexPath(cwd), index);
 }
 
-function createRun(cwd, skill) {
+function createRun(cwd, skill, eventDetails = {}) {
   ensureHistoryRoot(cwd);
   const index = readIndex(cwd);
   const runId = nextRunId(index);
@@ -150,17 +164,48 @@ function createRun(cwd, skill) {
   });
   writeJson(indexPath(cwd), index);
   writeJson(activePath(cwd), run);
-  appendEvent(cwd, run, { event: 'run_started', skill });
+  appendEvent(cwd, run, { event: 'run_started', skill, ...eventDetails });
   return run;
 }
 
-export function recordSkillStarted(cwd, skill) {
-  const run = readActive(cwd) || createRun(cwd, skill);
-  const lastEventAt = appendEvent(cwd, run, { event: 'skill_started', skill });
+export function recordSkillStarted(cwd, skill, eventDetails = {}) {
+  const run = readActive(cwd) || createRun(cwd, skill, eventDetails);
+  const lastEventAt = appendEvent(cwd, run, {
+    event: 'skill_started',
+    skill,
+    ...eventDetails,
+  });
   const next = { ...run, lastEventAt, status: 'open' };
   writeJson(activePath(cwd), next);
   updateIndexRun(cwd, run.runId, { status: 'open' });
   return next;
+}
+
+function markPendingFinish(cwd, run, turnId) {
+  const next = {
+    ...run,
+    pendingFinishTurnId: turnId || null,
+  };
+  writeJson(activePath(cwd), next);
+  return next;
+}
+
+export function recordExplicitPromptSkills(cwd, prompt, options = {}) {
+  const skills = extractExplicitAxonSkills(prompt);
+  let run = null;
+
+  for (const skill of skills) {
+    run = recordSkillStarted(cwd, skill, {
+      invocation: 'explicit_prompt',
+      ...(options.turnId ? { turnId: options.turnId } : {}),
+    });
+
+    if (skill === 'finish') {
+      run = markPendingFinish(cwd, run, options.turnId || null);
+    }
+  }
+
+  return { skills, run };
 }
 
 export function closeRunForFinish(cwd, skill) {
@@ -169,7 +214,16 @@ export function closeRunForFinish(cwd, skill) {
 
   appendEvent(cwd, run, { event: 'run_finished', skill });
   const finishedAt = appendEvent(cwd, run, { event: 'history_summary_requested', skill });
-  const closed = { ...run, lastEventAt: finishedAt, finishedAt, status: 'closed' };
+  const {
+    pendingFinishTurnId,
+    ...runWithoutPendingFinish
+  } = run;
+  const closed = {
+    ...runWithoutPendingFinish,
+    lastEventAt: finishedAt,
+    finishedAt,
+    status: 'closed',
+  };
   const summary = `${run.runDir}/summary.md`;
 
   writeJson(activePath(cwd), closed);
@@ -180,4 +234,31 @@ export function closeRunForFinish(cwd, skill) {
   });
 
   return { ...closed, summary };
+}
+
+export function closeRunForPendingFinish(cwd, turnId) {
+  const run = readActive(cwd);
+  if (!run || !Object.hasOwn(run, 'pendingFinishTurnId')) return null;
+  if (run.pendingFinishTurnId && turnId && run.pendingFinishTurnId !== turnId) return null;
+
+  return closeRunForFinish(cwd, 'finish');
+}
+
+export function buildHistorySummaryPrompt(run) {
+  const eventsPath = `${run.runDir}/events.jsonl`;
+  const summaryPath = run.summary;
+
+  return `Axon history run finished.
+
+Read \`${eventsPath}\` and write a detailed workflow summary to \`${summaryPath}\`.
+
+The summary should include:
+- Goal
+- Skill Sequence
+- What Happened
+- User Workflow Signals
+- Artifacts or files worth remembering
+- Follow-up
+
+Use the event log as evidence. Do not invent events that are not present.`;
 }
