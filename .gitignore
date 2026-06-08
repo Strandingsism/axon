@@ -2,6 +2,7 @@
 .axon/history/
 .axon/tasks.json
 .axon/state.json
+tdd/
 
 # Codex local project config and generated hooks
 .codex/
