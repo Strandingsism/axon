@@ -32,7 +32,7 @@ Axon takes a smaller approach:
 - `workflow.md` defines how the agent should work in this project.
 - Skills provide focused lifecycle behavior.
 - Hooks add runtime reminders and event capture.
-- `.axon/history` records how the user actually uses the workflow.
+- project-root `.axon/history` records how the user actually uses the workflow.
 
 The goal is not to make every project follow Axon's workflow. The goal is to let each project define its own workflow and give Codex enough structure to follow it.
 
@@ -62,7 +62,7 @@ Hooks are intentionally small. They do not generate summaries or replace agent j
 
 ### History
 
-Axon records real workflow usage in `.axon/history`.
+Axon records real workflow usage in the project-root `.axon/history`.
 
 A run starts with the first Axon skill call. A run closes when `finish` is used. After closing, Axon asks the agent to write a human-readable `summary.md` for that run.
 
@@ -71,9 +71,9 @@ A run starts with the first Axon skill call. A run closes when `finish` is used.
 - 10 lifecycle skills: `dream`, `brainstorm`, `write-plan`, `implement`, `execute`, `tdd`, `debug`, `review`, `finish`, `verify`
 - `create-hook` for project-local workflow automation
 - root-level `workflow.md` as the agent behavior protocol
-- `.axon/history` event logs and summaries
-- `.axon/tasks.json` task progress support
-- `.axon/project-map.md` and `.axon/interface-registry.md` workflow examples
+- project-root `.axon/history` event logs and summaries
+- project-root `.axon/tasks.json` task progress support
+- project-root `.axon/project-map.md` and `.axon/interface-registry.md` workflow examples
 - no HUD, pane manager, or heavy orchestrator
 
 ## Install

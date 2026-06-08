@@ -7,6 +7,8 @@ import {
 } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { axonPath, resolveAxonRoot } from './axon-root.mjs';
+
 export const AXON_SKILLS = [
   'dream',
   'brainstorm',
@@ -72,7 +74,7 @@ function localDate() {
 }
 
 function historyRoot(cwd) {
-  return resolve(cwd, '.axon', 'history');
+  return axonPath(cwd, 'history');
 }
 
 function activePath(cwd) {
@@ -88,7 +90,7 @@ function runDirRelative(runId) {
 }
 
 function runDirAbsolute(cwd, runId) {
-  return resolve(cwd, runDirRelative(runId));
+  return resolve(resolveAxonRoot(cwd), runDirRelative(runId));
 }
 
 function ensureHistoryRoot(cwd) {
@@ -123,12 +125,13 @@ function nextRunId(index) {
 }
 
 function appendEvent(cwd, run, event) {
+  const root = resolveAxonRoot(cwd);
   const entry = {
     ts: nowIso(),
     runId: run.runId,
     ...event,
   };
-  appendFileSync(resolve(cwd, run.runDir, 'events.jsonl'), `${JSON.stringify(entry)}\n`);
+  appendFileSync(resolve(root, run.runDir, 'events.jsonl'), `${JSON.stringify(entry)}\n`);
   return entry.ts;
 }
 

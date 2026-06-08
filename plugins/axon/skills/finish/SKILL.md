@@ -67,7 +67,7 @@ If neither `main` nor `master` is the base, ask the user to confirm the target b
 
 ### 4. Final Project Map Update
 
-Update `.axon/project-map.md` one last time:
+Update the project-root `.axon/project-map.md` one last time:
 - Mark the `finish` phase checkbox
 - Record the outcome in the Goal section
 - Ensure the file is under 100 lines — compress if needed

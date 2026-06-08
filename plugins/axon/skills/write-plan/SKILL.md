@@ -108,7 +108,7 @@ signatures, not implementations.
   - `get(userId: string): string | undefined`
 ```
 
-If the project uses `.axon/interface-registry.md`, update or reference it. Do
+If the project uses project-root `.axon/interface-registry.md`, update or reference it. Do
 not invent required registry sections when the user's workflow does not use
 that file.
 
@@ -148,7 +148,7 @@ Keep the task specific enough to execute, but do not prescribe the full code.
 
 ### 6. Write tasks.json When Used
 
-If the project uses `.axon/tasks.json`, write or update it with task titles and
+If the project uses project-root `.axon/tasks.json`, write or update it with task titles and
 initial status.
 
 ```json
@@ -188,7 +188,7 @@ Present the plan for approval when the workflow or risk level requires it.
 Example:
 
 ```text
-I wrote the implementation plan at `.axon/plans/2026-06-08-token-store-plan.md`.
+I wrote the implementation plan at the project-root `.axon/plans/2026-06-08-token-store-plan.md`.
 It has 2 tasks: token persistence and login integration.
 Please review before implementation.
 ```

@@ -96,6 +96,9 @@ These files are optional workflow supports:
 - `.axon/tasks.json` - task progress for hook support
 - `.axon/history/` - skill event history and summaries
 
+All `.axon/...` paths are project-root-relative. Do not create nested `.axon`
+directories when working from a subdirectory.
+
 Use them when they exist or when `workflow.md` asks for them. Do not assume every
 project uses all of them.
 

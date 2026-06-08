@@ -32,7 +32,7 @@ Axon 选择更小的方式：
 - `workflow.md` 定义这个项目里 agent 应该如何工作。
 - skills 提供聚焦的生命周期能力。
 - hooks 提供运行时提醒和事件记录。
-- `.axon/history` 记录用户真实使用 workflow 的方式。
+- 项目根目录 `.axon/history` 记录用户真实使用 workflow 的方式。
 
 目标不是让所有项目遵循 Axon 的 workflow，而是让每个项目定义自己的 workflow，并给 Codex 足够的结构去遵循它。
 
@@ -62,7 +62,7 @@ Hooks 刻意保持很小。它们不生成总结，也不替代 agent 判断。
 
 ### History
 
-Axon 会把真实 workflow 使用记录到 `.axon/history`。
+Axon 会把真实 workflow 使用记录到项目根目录的 `.axon/history`。
 
 第一次 Axon skill 调用会开始一个 run。使用 `finish` 后 run 关闭。关闭后，Axon 会要求 agent 为该 run 编写人类可读的 `summary.md`。
 
@@ -71,9 +71,9 @@ Axon 会把真实 workflow 使用记录到 `.axon/history`。
 - 10 个生命周期 skills：`dream`、`brainstorm`、`write-plan`、`implement`、`execute`、`tdd`、`debug`、`review`、`finish`、`verify`
 - `create-hook` 用于项目本地 workflow 自动化
 - 根目录 `workflow.md` 作为 agent 行为协议
-- `.axon/history` event logs 和 summaries
-- `.axon/tasks.json` 任务进度支持
-- `.axon/project-map.md` 和 `.axon/interface-registry.md` workflow 示例
+- 项目根目录 `.axon/history` event logs 和 summaries
+- 项目根目录 `.axon/tasks.json` 任务进度支持
+- 项目根目录 `.axon/project-map.md` 和 `.axon/interface-registry.md` workflow 示例
 - 没有 HUD、pane manager 或重型 orchestrator
 
 ## 安装

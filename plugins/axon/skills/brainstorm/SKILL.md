@@ -84,7 +84,7 @@ When working in existing codebases, follow established patterns. Include targete
 
 ### 6. Write the Design Document
 
-Save the agreed-upon design to:
+Save the agreed-upon design under the project-root `.axon/` directory:
 
 ```
 .axon/specs/YYYY-MM-DD-<topic>-design.md
@@ -115,13 +115,13 @@ Fix issues inline. No need for a second review pass.
 
 The user must read and approve the spec file before you proceed. Present it clearly:
 
-> I've written the design document at `.axon/specs/2026-06-05-auth-flow-design.md`. Please review it. Once approved, I'll invoke `write-plan` to break this into implementation tasks.
+> I've written the design document at the project-root `.axon/specs/2026-06-05-auth-flow-design.md`. Please review it. Once approved, I'll invoke `write-plan` to break this into implementation tasks.
 
 Do not invoke `write-plan` or any other implementation skill until the user confirms approval. "Looks good", "Approved", or any explicit confirmation counts. Silence does not.
 
 ### 9. Update Project Map
 
-After user approval, update `.axon/project-map.md`:
+After user approval, update the project-root `.axon/project-map.md`:
 - Set the Goal
 - Mark `1. brainstorm` as done with the design doc path
 - Initialize phase checkboxes for `write-plan`, `implement`, `review`, `finish`
@@ -164,6 +164,6 @@ When in doubt, use this skill. The cost of a 2-minute brainstorm is always lower
 
 This skill hands off to `write-plan`. It does NOT hand off directly to `implement`, `tdd`, or any other execution skill.
 
-Writes to: `.axon/project-map.md` (initialize)
+Writes to: project-root `.axon/project-map.md` (initialize)
 
 Required reading before invoking this skill: none — brainstorming is the entry point.

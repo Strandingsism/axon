@@ -1,12 +1,11 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, basename } from 'node:path';
 
+import { axonPath } from './axon-root.mjs';
+
 // PostToolUse hook — after Write/Edit to .axon/tasks.json, check if all done.
 // If all tasks are "done", inject a prompt telling the agent to ask the user about review.
 // Never blocks. Only prompts.
-
-const CWD = process.cwd();
-const TASKS_FILE = resolve(CWD, '.axon', 'tasks.json');
 
 // --- main ---
 
@@ -28,6 +27,8 @@ function readStdin() {
 }
 
 const payload = await readStdin();
+const CWD = payload?.cwd || process.cwd();
+const TASKS_FILE = axonPath(CWD, 'tasks.json');
 
 // Only care about Write or Edit on tasks.json
 if (!payload || !['Write', 'Edit'].includes(payload.tool_name)) {
@@ -63,7 +64,7 @@ if (!allDone) {
 // All done — inject the review prompt
 const prompt = `## ALL TASKS COMPLETE (injected by Axon)
 
-\`.axon/tasks.json\` shows all tasks are \`"done"\`.
+The project-root \`.axon/tasks.json\` shows all tasks are \`"done"\`.
 
 **Ask the user now:**
 > "All tasks complete. Proceed to review?"

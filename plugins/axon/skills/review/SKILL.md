@@ -32,7 +32,7 @@ Review early, review often. A second pair of eyes catches what the implementer m
 - Nothing was built that wasn't specified (scope creep)
 - Edge cases mentioned in the design are handled
 - Error cases described in the plan are covered
-- **Every public export has a matching entry in `.axon/interface-registry.md`** — unregistered exports are scope creep
+- **Every public export has a matching entry in the project-root `.axon/interface-registry.md`** — unregistered exports are scope creep
 - **Every registered interface is implemented** — registered but missing = incomplete
 
 If spec compliance fails, **do not proceed to Stage 2.** The implementer must fix gaps first. Code can be beautiful and completely wrong. Spec compliance first, always.

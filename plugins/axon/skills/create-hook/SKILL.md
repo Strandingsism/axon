@@ -31,6 +31,8 @@ tdd/hooks/<hook-name>.test.mjs
 .axon/hooks/<hook-name>.md
 ```
 
+All `.axon/...` paths in this skill are project-root-relative. Do not create nested `.axon` directories when the user is working from a subdirectory.
+
 Use another scope only when the user explicitly asks:
 
 | Scope | Paths | Use when |
@@ -161,7 +163,7 @@ Translate the user's request into:
 - Output behavior
 - Failure behavior
 
-Prefer docs-derived behavior over generic templates. If the project already has `.axon/tasks.json`, `.axon/project-map.md`, or `.axon/interface-registry.md`, make the hook understand those files by name.
+Prefer docs-derived behavior over generic templates. If the project already has project-root `.axon/tasks.json`, `.axon/project-map.md`, or `.axon/interface-registry.md`, make the hook understand those files by name.
 
 ### 3. Confirm the Behavior
 

@@ -1,10 +1,11 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+
+import { axonPath } from './axon-root.mjs';
 
 const GATED_SKILLS = ['implement', 'execute', 'review', 'finish'];
 
 function tasksPath(cwd) {
-  return resolve(cwd, '.axon', 'tasks.json');
+  return axonPath(cwd, 'tasks.json');
 }
 
 export function resetTasksJson(cwd) {
@@ -23,7 +24,7 @@ export function resetTasksJson(cwd) {
 export function buildSkillPrompt(skillName, tasksObj) {
   const mode = skillName === 'implement' ? 'subagent-driven' : 'inline';
   const taskNote = tasksObj?.tasks?.length
-    ? '\n- .axon/tasks.json has been reset to pending; read it and mirror those tasks in the Codex task system.'
+    ? '\n- The project-root .axon/tasks.json has been reset to pending; read it and mirror those tasks in the Codex task system.'
     : '';
 
   return `Axon skill context: ${skillName} (${mode}).
@@ -31,6 +32,7 @@ export function buildSkillPrompt(skillName, tasksObj) {
 Before using this skill:
 - Re-check AGENTS.md and relevant docs if the task context is unclear.
 - If workflow.md exists, follow its planning, confirmation, verification, and reporting preferences.
+- Treat all .axon/... paths as project-root-relative, not current-subdirectory-relative.
 - Use .axon/project-map.md for project orientation if it exists or workflow.md requires it.
 - Use .axon/interface-registry.md for public interfaces if it exists or workflow.md requires it.
 - Use .axon/tasks.json for task progress if it exists.

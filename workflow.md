@@ -14,7 +14,7 @@ It does not replace:
 
 - `AGENTS.md`, which explains how this project runs.
 - `DESIGN.md`, which explains how generated product output should look and feel.
-- `.axon/*`, which stores Axon-generated workflow artifacts and runtime records.
+- project-root `.axon/*`, which stores Axon-generated workflow artifacts and runtime records.
 
 `workflow.md` is the source of truth for user-owned agent behavior when the
 project chooses to use it.

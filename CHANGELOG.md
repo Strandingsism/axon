@@ -4,6 +4,13 @@ All notable changes to Axon will be documented in this file.
 
 This project follows a pragmatic version history. Versions refer to the Codex plugin version in `plugins/axon/.codex-plugin/plugin.json`.
 
+## [0.1.17] - 2026-06-08
+
+### Fixed
+
+- Resolve Axon runtime artifacts to the project root when hooks run from a subdirectory.
+- Clarify skill prompts so `.axon/...` artifacts are generated under the project root.
+
 ## [0.1.16] - 2026-06-08
 
 ### Fixed
