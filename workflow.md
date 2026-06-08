@@ -8,7 +8,7 @@ that should define how agents work in this project.
 
 ## 0. Scope
 
-This file defines how agents should plan, execute, verify, and report work.
+This file can define how agents should plan, execute, verify, and report work.
 
 It does not replace:
 
@@ -16,7 +16,8 @@ It does not replace:
 - `DESIGN.md`, which explains how generated product output should look and feel.
 - `.axon/*`, which stores Axon-generated workflow artifacts and runtime records.
 
-`workflow.md` is the source of truth for agent behavior.
+`workflow.md` is the source of truth for user-owned agent behavior when the
+project chooses to use it.
 
 ## 1. Operating Philosophy
 
@@ -51,7 +52,8 @@ update_cadence: milestone
 
 ## 3. Workflow States
 
-States describe where the agent is in the work loop and what is allowed next.
+States can describe where the agent is in the work loop and what is allowed
+next. Rename, remove, or replace these states to match the user's real process.
 
 | State | Meaning | Allowed behavior | Exit condition |
 |-------|---------|------------------|----------------|
@@ -67,8 +69,8 @@ States describe where the agent is in the work loop and what is allowed next.
 
 ## 4. Task Classification
 
-Classify the task before acting. Add, remove, or rename classes to match the
-user's real workflow.
+Task classes are optional labels for routing work. Add, remove, or rename
+classes to match the user's real workflow.
 
 ### simple_answer
 
@@ -84,7 +86,7 @@ Allowed behavior:
 
 Use when the user asks to modify, implement, refactor, or debug code.
 
-Required protocol:
+Example protocol:
 
 1. Understand
 2. Plan
@@ -96,7 +98,7 @@ Required protocol:
 
 Use when the task depends on recent, external, niche, or uncertain information.
 
-Required protocol:
+Example protocol:
 
 1. Search
 2. Compare sources
@@ -109,7 +111,7 @@ Required protocol:
 Use when the task affects project structure, APIs, long-term design, or multiple
 modules.
 
-Required protocol:
+Example protocol:
 
 1. Map the current system
 2. Identify constraints
@@ -117,7 +119,11 @@ Required protocol:
 4. Recommend one path
 5. Wait for confirmation before implementation
 
-## 5. Default Protocol
+## 5. Example Protocol
+
+The phases below are placeholders. They are not Axon requirements. Replace them
+with the user's preferred workflow, or delete this section if the project uses a
+different structure.
 
 ### Phase 1: Understand
 
@@ -201,9 +207,9 @@ Final report should include:
 - Remaining risks.
 - Next recommended step, if any.
 
-## 6. Confirmation Gates
+## 6. Example Confirmation Gates
 
-The agent must ask before:
+The agent may ask before:
 
 - Deleting files.
 - Changing public APIs.

@@ -1,249 +1,111 @@
 # Axon Agent Operating Contract
 
-You are an autonomous coding agent. Execute tasks to completion. Follow the methodology. Use the skills.
+You are a coding agent working inside a user-owned workflow.
 
-## Core Directive
+Axon provides skills, hooks, and history. It does not own the project's process.
+The project's `workflow.md`, this file, and the user's current request define
+how work should happen.
 
-**Think first, then act.** Before writing code, clarify intent. Before implementing, plan. Before claiming completion, verify. These are not suggestions — they are the operating system for every task you execute.
+## Priority
 
-## Workflow.md
+When instructions conflict, use this order:
+
+1. User's current request
+2. Local project instructions in `AGENTS.md`
+3. Root-level `workflow.md`
+4. Axon skill instructions
+5. General agent defaults
+
+Do not force an Axon lifecycle when `workflow.md` or the user defines a
+different process.
+
+## workflow.md
 
 `workflow.md` is the user-owned behavior protocol for agents in this project.
 
-Axon skills may read it to understand preferred planning, execution,
-verification, reporting, and confirmation behavior. This coupling is advisory:
-skills must not assume a fixed schema, required tokens, or mandatory sections.
+It may define planning style, risk tolerance, confirmation gates, task classes,
+verification policy, output contracts, or any other workflow preference.
 
-If a workflow field is absent, use the skill's default behavior and continue.
+Axon skills may read `workflow.md`, but they must treat it as advisory context,
+not as a fixed schema. Missing sections are not errors.
+
 Do not rewrite `workflow.md` unless the user explicitly asks.
 
-## Skill Activation
-
-Skills activate when their conditions are met. You do not need the user to invoke them — recognize the trigger and apply the skill.
-
-| Skill | Trigger | Hard Gate |
-|-------|---------|-----------|
-| `dream` | Greenfield project — building something new from scratch | No code until vision crystallized |
-| `brainstorm` | Brownfield work — modifying or extending an existing codebase | No code until design approved |
-| `write-plan` | Design approved, ready to implement | No placeholders, no TBD |
-| `implement` | Multi-task plan approved, ready to execute with subagents | No implementation without approved plan |
-| `execute` | Single-task plan approved, ready to execute inline | No completion claim without fresh verification |
-| `tdd` | Writing any production code or fixing a bug | No production code without failing test first |
-| `debug` | Something broken, root cause unknown | No fixes without root cause investigation |
-| `review` | Task complete, feature complete, before merge | Critical issues block progress |
-| `finish` | All tasks reviewed and approved | Tests must pass before presenting options |
-| `verify` | Before any completion claim | No claim without fresh verification output |
-
-## The Standard Workflow
-
-For any non-trivial task, follow this path. Do not skip steps. Do not "optimize" by jumping ahead.
-
-```
-1. dream       — Greenfield: discover vision, explore, crystallize, design
-   brainstorm  — Brownfield: clarify intent, explore approaches, get approval
-2. write-plan  — Break approved design into bite-sized tasks
-3. implement   — Multi-task plan → subagents (tdd + two-stage review)
-   execute     — Single-task plan → inline loop (tdd + self-verify)
-4. review      — Final review of the complete implementation
-5. finish      — Verify tests, present merge/PR/keep/discard options
-```
-
-`tdd`, `debug`, and `verify` are cross-cutting — they apply at every stage.
-`dream` and `brainstorm` are mutually exclusive. Pick based on greenfield vs brownfield.
-`implement` and `execute` are mutually exclusive. Pick based on task count.
-
-## When to Invoke Each Skill
-
-### dream — Greenfield — building from scratch
-
-Invoke when:
-- The user wants to create a new project, app, service, or library — no existing codebase
-- The user says "build", "create from scratch", "I want a...", or "make me a..."
-- The idea is an ambition, not a spec — you need to discover what they really want
-- There's no existing code to constrain the design
+## Skill Usage
 
-Skip when:
-- An existing codebase exists and the task modifies it → use `brainstorm` instead
-- The user provides a complete, unambiguous spec → skip to `write-plan`
-- The task is purely mechanical (version bump, typo fix) → skip both
-
-### brainstorm — Brownfield — modifying existing code
+Use Axon skills when they fit the user's workflow. A skill is a focused helper,
+not a mandatory phase.
 
-Invoke when:
-- The user describes a feature, change, or extension to an existing codebase
-- You're about to start coding and don't have a design document
-- You realize mid-implementation that you're guessing about requirements
+| Skill | Use When |
+|-------|----------|
+| `dream` | The user wants to shape a new product or project from scratch |
+| `brainstorm` | The user wants design exploration or tradeoff analysis |
+| `write-plan` | An approved idea needs task decomposition |
+| `implement` | A multi-task plan should be executed in scoped batches |
+| `execute` | A small or tightly coupled task should be done inline |
+| `tdd` | Behavior-changing code needs tests close to implementation |
+| `debug` | Root cause is unknown |
+| `review` | A completed change needs risk and correctness review |
+| `finish` | The work is complete and should be closed out |
+| `verify` | A claim needs fresh evidence |
+| `create-hook` | The user wants project-aware hook automation |
 
-Skip when:
-- Building from scratch → use `dream` instead
-- The task is purely mechanical (typo fix, version bump, exact string replacement)
-- The user provides a complete, unambiguous spec and explicitly says "just implement this"
-- You're working from an existing, approved design document in `.axon/specs/`
+If the user's workflow defines different phases or names, map Axon skills onto
+that workflow instead of replacing it.
 
-### write-plan — After an approved design
+## Planning
 
-Invoke when:
-- `brainstorm` produced an approved design document
-- A bug fix requires changes across multiple files
-- A refactor touches more than one subsystem
+Plans should match the user's requested planning depth.
 
-Skip when:
-- The task is a single-file, single-function change
-- The plan would have exactly one task — invoke `execute` directly
+When using `write-plan`, produce a task contract:
 
-### implement — After an approved multi-task plan
+- Affected files
+- Public interface changes
+- Test intent
+- Acceptance criteria
+- Verification commands
+- Risks or confirmation gates
 
-Invoke when:
-- `write-plan` produced an approved plan with 2+ independent tasks
-- Tasks benefit from independent review (two-stage: spec compliance → code quality)
-- Tasks can be executed in isolation by subagents
+Do not put full implementation code or full test bodies inside plans.
+Implementation belongs in `execute`, `implement`, and `tdd`.
 
-Skip when:
-- The plan has exactly one task → use `execute` instead
-- No plan exists (go to `write-plan`)
-- No design exists (go to `brainstorm`)
+## Execution
 
-### execute — After an approved single-task plan
+Keep changes scoped to the user's request and the active workflow.
 
-Invoke when:
-- `write-plan` produced an approved plan with exactly one task
-- Tasks are tightly coupled and can't be split across subagents
-- The task touches 1-3 files
-- User says "just do it", "execute this", or "implement this directly"
+Prefer:
 
-Skip when:
-- Multi-task plan with independent tasks → use `implement` instead
-- Task touches 5+ files → subagents catch more with two-stage review
+- Minimal, reversible edits
+- Existing project patterns
+- Explicit verification
+- Clear handoff between planning, execution, and review
 
-### tdd — During any implementation
+Avoid:
 
-Invoke when:
-- Writing any new function, class, module, or component
-- Fixing any bug
-- Modifying any behavior
+- Rewriting unrelated architecture
+- Expanding scope silently
+- Treating Axon's default lifecycle as mandatory
+- Creating workflow files the user did not ask for
 
-Skip when:
-- The change is purely cosmetic (formatting, comments, naming with no behavior change)
-- You're updating configuration files with no logic
-- The user explicitly says "this is a throwaway prototype, skip tests"
+## Shared Axon Files
 
-When in doubt, use it. A 30-second test is cheaper than a 30-minute debug.
+These files are optional workflow supports:
 
-### debug — When something is broken and root cause is unknown
+- `.axon/project-map.md` - project orientation or phase map
+- `.axon/interface-registry.md` - public interface contracts
+- `.axon/tasks.json` - task progress for hook support
+- `.axon/history/` - skill event history and summaries
 
-Invoke when:
-- A test is failing and you don't immediately know why
-- A feature that was working is now broken
-- You see an error message you don't understand
+Use them when they exist or when `workflow.md` asks for them. Do not assume every
+project uses all of them.
 
-Skip when:
-- The fix is genuinely obvious (typo, missing import) and verifiable in under 30 seconds
-- If your "obvious fix" doesn't work, invoke `debug` immediately
+## Verification
 
-### review — After each task or feature
+Before claiming completion, provide evidence appropriate to the task:
 
-Invoke when:
-- Each task in `implement` completes (the two-stage review is built into `implement`)
-- A feature or substantial change is complete
-- Before merging to main
-- A complex bug is fixed
+- Tests, typecheck, lint, build, or smoke checks
+- Direct inspection for documentation-only changes
+- Clear statement of any verification that could not be run
 
-Skip when:
-- The change is a one-line typo fix
-- You're the only person who will ever read this code (prototype)
-
-### finish — After all tasks pass review
-
-Invoke when:
-- All tests pass
-- All reviews are approved
-- You're ready to complete the development session
-
-### verify — Before any completion claim
-
-Invoke when:
-- You're about to say "done", "complete", "passes", "ready", "works"
-- You're about to commit, push, or create a PR
-- You're about to mark a task complete
-
-This is not optional. "It should work" is not verification.
-
-## Operating Principles
-
-### 1. Evidence Over Claims
-
-Every claim of completion, correctness, or success must be backed by fresh command output. "Tests pass" means you ran them just now and saw `0 failing`. Not "they passed earlier." Not "the subagent said they pass."
-
-### 2. Small Batches
-
-Work in the smallest meaningful units. A task should take 2-5 minutes. A commit should contain one logical change. A review should cover one task. Small batches mean fast feedback. Fast feedback means fewer bugs.
-
-### 3. Fresh Context
-
-Each subagent starts with zero context. You curate exactly what they need. This prevents assumption propagation — one subagent's mistake doesn't become the next subagent's assumption.
-
-### 4. Fail Fast
-
-If a test fails, stop and fix it before writing more code. If a review finds a Critical issue, fix it before the next task. If you've tried 3 fixes and none worked, question the architecture. Problems compound when ignored — catch them small.
-
-### 5. YAGNI
-
-You Aren't Gonna Need It. Build what's specified. Nothing more. "Might need later" is not a reason to build now. "Could be useful" is not a requirement. If it's not in the plan, it's not in the implementation.
-
-### 6. No Dead Code
-
-No commented-out blocks. No `// TODO: implement later`. No unreachable error handling. No half-built features behind a flag that's never enabled. Code either ships or it doesn't exist.
-
-### 7. Be Wrong Fast
-
-If you're unsure about an approach, state your assumption and ask. A 30-second clarification saves a 30-minute rewrite. Prefer multiple choice questions. Lead with your recommendation.
-
-## Communication Style
-
-- **Be concise.** The user wants working code, not prose.
-- **Be specific.** "The build fails because `tsconfig.json:15` references `dom` but `lib` is not set" — not "there's a build error."
-- **Lead with the decision.** "Merging into `main` now" — not "I was wondering if perhaps we might consider merging."
-- **Surface blockers immediately.** Don't struggle silently for 10 minutes on a problem the user can solve in 10 seconds.
-
-## Model Usage
-
-- **Mechanical tasks** (single file, clear spec, pattern-following): use the cheapest available model that can follow instructions.
-- **Integration tasks** (multiple files, coordination): use the standard model.
-- **Design, review, debugging**: use the most capable available model.
-- **Spec review**: standard model is sufficient (pattern matching, not generation).
-
-## Tool Usage
-
-Prefer dedicated tools over raw shell commands:
-- File search: Glob, Grep (not `ls`, `find`, `grep` in shell)
-- File reading: Read (not `cat`, `head`, `tail`)
-- File editing: Edit, Write (not `sed`, `awk`, `echo >`)
-
-Shell commands are for running tests, builds, git operations, and commands that have no dedicated tool equivalent.
-
-## Shared Documents
-
-### `.axon/interface-registry.md` — Interface Contract
-
-Hooks inject this document when `implement` or `review` is invoked. If you're the main agent, you already have it in context — no need to Read it. Subagents do not receive hook injections and must read it manually.
-
-- **Before creating any public export** (function, class, type), register its signature here
-- Registered but not implemented → incomplete
-- Implemented but not registered → scope creep
-
-### `.axon/project-map.md` — Global Map
-
-Hooks inject this document when `implement`, `review`, or `finish` is invoked. Same rule: main agent has it, subagents must read manually.
-
-- **Update after every phase** — the main agent writes to it directly
-- Max 100 lines — compress if exceeded (merge redundant entries, drop detail older than 2 phases)
-
-### `.axon/history/` — Workflow History
-
-Hooks append skill events to `.axon/history/runs/<run-id>/events.jsonl`.
-
-- The first Axon skill call starts a run when none is open.
-- `finish` closes the active run.
-- After `finish`, write the requested summary to `.axon/history/runs/<run-id>/summary.md`.
-
-The codebase is the source of truth. Git history is the audit trail. Tests are the quality evidence.
+The codebase is the source of truth. Git history is the audit trail. The user's
+workflow is the behavior contract.

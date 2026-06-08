@@ -1,227 +1,239 @@
 ---
 name: write-plan
-description: "Use after an approved design. Break the design into bite-sized implementation tasks with exact file paths, complete code blocks, and verification steps."
+description: "Use after an approved design. Break the design into bite-sized implementation tasks with exact file paths, interface contracts, test intent, acceptance criteria, and verification steps. Do not include detailed implementation code."
 ---
 
 # Writing Implementation Plans
 
-Convert an approved design document into a sequence of bite-sized tasks. A good plan assumes the implementer has zero context for the codebase and questionable taste. Every step must contain actual code — no placeholders, no hand-waving, no "implement error handling" without showing exactly what that means.
+Convert an approved design into a sequence of small, executable tasks.
+
+The plan is a task contract, not an implementation dump. It should tell the
+implementer what to change, where to change it, what behavior to prove, and how
+to verify success. The actual production code belongs in `implement`,
+`execute`, and `tdd`, not inside this skill's output.
 
 ## Hard Gate
 
-**NO PLACEHOLDERS. NO "TBD". NO "IMPLEMENT LATER".**
+**NO DETAILED IMPLEMENTATION CODE IN PLANS.**
 
-A plan that contains unresolved steps is not a plan. It's a todo list pretending to be a plan. If you cannot write the exact code for a step, you don't understand the design well enough — go back to `brainstorm`.
+Do not include complete production functions, full component bodies, full test
+files, or copy-paste implementation blocks. A plan may include:
+
+- File paths
+- Public signatures
+- Data shapes
+- Short pseudo-code when it clarifies control flow
+- Test names and expected behavior
+- Commands and expected verification result
+
+A plan must not include:
+
+- Complete implementation code
+- Full test bodies
+- Large code blocks copied into tasks
+- "TBD", "TODO", "implement later", or unresolved decisions
+- Hidden assumptions that the implementer must guess
+
+If you feel the need to write full code in the plan, the task is probably ready
+for `execute` instead of `write-plan`.
 
 ## When to Use
 
-Always after `brainstorm` produces an approved design. Also use when:
+Use after a design has been approved and the work needs decomposition.
 
-- A bug fix requires changes across multiple files
-- A refactor touches more than one subsystem
-- The user gives you a complete, unambiguous spec directly (skipping brainstorm)
+Also use when:
 
-Skip when the task is a single-file, single-function change with no architectural implications. In that case, invoke `implement` directly with `tdd`.
+- A bug fix spans multiple files.
+- A refactor touches more than one subsystem.
+- The user gives a complete, unambiguous spec and wants a plan before changes.
+
+Skip when:
+
+- The task is a single-file, single-function change.
+- The user explicitly asks for direct execution.
+- The plan would be more verbose than the change itself.
+
+In those cases, move to `execute` and keep TDD close to the code.
 
 ## Process
 
-### 1. Load and Understand the Design
+### 1. Load the Source of Truth
 
-Read the design document from `.axon/specs/`. If anything is unclear or contradictory, resolve it with the user before writing the plan. Do not "interpret" ambiguity — ask.
+Read the approved design, user request, `workflow.md` if present, and any
+project instructions that affect planning style.
+
+If `workflow.md` defines planning depth, confirmation gates, output contracts,
+or task classes, follow those preferences. If it is absent or incomplete, use
+this skill's defaults.
 
 ### 2. Scope Check
 
-If the design covers multiple independent subsystems, split it into separate plans. Each plan should produce working, testable software on its own. A plan that touches authentication, database migrations, and frontend components is three plans.
+Split independent concerns into separate plans. A plan should produce working,
+testable progress on its own.
+
+If a design touches authentication, database migrations, and frontend UI, that
+is usually three plans unless the project workflow says otherwise.
 
 ### 3. Map the Files
 
-Before defining tasks, list every file this plan touches:
+Before defining tasks, list every expected file change:
 
 ```markdown
 ## Files
 
 ### Create
-- `src/auth/token-store.ts` — Encrypted token persistence
-- `src/auth/__tests__/token-store.test.ts` — Token store tests
+- `src/auth/token-store.ts` - Token persistence module
+- `src/auth/token-store.test.ts` - Token persistence behavior tests
 
 ### Modify
-- `src/auth/login.ts:42-78` — Replace in-memory map with token-store
+- `src/auth/login.ts` - Replace in-memory token handling
 
 ### Delete
 - (none)
 ```
 
-Files should have one clear responsibility. Smaller, focused files beat large ones. Files that change together should live together.
+Include line numbers only when they are stable and useful.
 
 ### 4. Declare Interfaces
 
-Before writing task details, declare every new public API in `.axon/interface-registry.md`:
+Before writing task details, declare new or changed public contracts. Use
+signatures, not implementations.
 
 ```markdown
-## Auth Module
-- `login(email: string, password: string): Promise<Session>` — Authenticate user
-- `logout(sessionId: string): Promise<void>` — End session
-- `class TokenStore(dir: string)` — Encrypted token persistence
+## Interfaces
+
+- `class TokenStore`
+  - `constructor(dir: string)`
   - `set(userId: string, token: string): void`
   - `get(userId: string): string | undefined`
 ```
 
-This serves two purposes:
-- **For the implementer**: clear contract before coding begins
-- **For the reviewer**: every public export must have a matching registry entry
-
-Only declare what this plan introduces. Don't list existing APIs unless you're changing their signatures.
+If the project uses `.axon/interface-registry.md`, update or reference it. Do
+not invent required registry sections when the user's workflow does not use
+that file.
 
 ### 5. Define Tasks
 
-Each task is **one action (2-5 minutes)** with this structure:
+Each task should be one concrete deliverable.
 
 ```markdown
 ### Task N: <descriptive name>
 
-**Files:**
-- Create: `path/to/file.ts`
-- Modify: `path/to/existing.ts:30-45`
-- Test: `path/to/__tests__/file.test.ts`
+**Goal**
+- <behavior or project state this task creates>
 
-**Steps:**
+**Files**
+- Create: `path/to/file`
+- Modify: `path/to/file`
+- Test: `path/to/test`
 
-- [ ] 1. Write failing test:
-  ```ts
-  // Complete test code — not a sketch
-  describe('tokenStore', () => {
-    it('persists tokens across restarts', () => {
-      const store = new TokenStore(tmpDir)
-      store.set('user-1', 'token-abc')
-      const restored = new TokenStore(tmpDir)
-      expect(restored.get('user-1')).toBe('token-abc')
-    })
-  })
-  ```
-- [ ] 2. Run test, confirm it fails with expected error:
-  ```
-  npx jest token-store.test.ts
-  # Expected: FAIL — "TokenStore not found"
-  ```
-- [ ] 3. Implement minimal code to pass:
-  ```ts
-  // Complete implementation — not a skeleton
-  export class TokenStore {
-    constructor(private dir: string) {}
-    set(userId: string, token: string): void { ... }
-    get(userId: string): string | undefined { ... }
-  }
-  ```
-- [ ] 4. Run test, confirm it passes:
-  ```
-  npx jest token-store.test.ts
-  # Expected: PASS — 1/1
-  ```
-- [ ] 5. Commit:
-  ```
-  git add src/auth/token-store.ts src/auth/__tests__/token-store.test.ts
-  git commit -m "feat(auth): add encrypted token persistence"
-  ```
+**Interfaces**
+- <new or changed public signature, if any>
 
-**Success**: TokenStore persists and retrieves tokens correctly.
+**Steps**
+1. Write or update tests for <behavior>.
+2. Implement the minimal behavior needed for those tests.
+3. Run <verification command>.
+4. Update docs or task records if required by `workflow.md`.
 
-Each step is one atomic action. Write the test → run it → see it fail → write the code → run it → see it pass → commit.
+**Acceptance**
+- <observable condition>
+- <verification command and expected high-level result>
 
-### 5.5. Write tasks.json
+**Risks**
+- <edge case, migration concern, or integration risk>
+```
 
-After defining all tasks, write `.axon/tasks.json` with the task list. This is the machine-readable manifest that hooks read to track progress and detect completion.
+Keep the task specific enough to execute, but do not prescribe the full code.
+
+### 6. Write tasks.json When Used
+
+If the project uses `.axon/tasks.json`, write or update it with task titles and
+initial status.
 
 ```json
 {
-  "planFile": ".axon/plans/YYYY-MM-DD-<topic>-plan.md",
+  "planFile": ".axon/plans/YYYY-MM-DD-topic-plan.md",
   "tasks": [
-    { "id": 1, "name": "Write TokenStore with set/get", "status": "pending" },
-    { "id": 2, "name": "Integrate login flow", "status": "pending" }
+    { "id": 1, "name": "Add token persistence contract", "status": "pending" },
+    { "id": 2, "name": "Integrate token persistence in login", "status": "pending" }
   ]
 }
 ```
 
 Rules:
-- `id` matches the task number in the plan
-- `name` is the task title (same as `### Task N: <name>`)
-- All start as `"pending"`
-- Keep names short — hooks inject them into prompts
-- Do NOT skip this step. Hooks depend on it.
 
-Every step must contain **complete, copy-pasteable content.** These are failures:
+- `id` matches the task number in the plan.
+- `name` matches the task title.
+- All new tasks start as `"pending"`.
+- Keep names short.
 
-| Instead of... | Write the actual... |
-|---------------|-------------------|
-| `// TBD` | The complete implementation |
-| `// TODO: add error handling` | The exact try/catch with specific error types |
-| `// implement later` | The implementation, now |
-| `// similar to Task 3` | The full code, repeated if necessary |
-| `add appropriate error handling` | The exact error types and handling logic |
-| `describe('...')` with no test body | The complete test with assertions |
-| "Create the component" with no code | The full component source |
+Skip this file when the user's workflow does not use Axon task tracking.
 
 ### 7. Self-Review the Plan
 
-Before presenting the plan to the user, verify:
+Before presenting the plan, verify:
 
-1. **Coverage**: Does every requirement in the design doc map to at least one task? Walk through the spec line by line.
-2. **Placeholders**: Grep for `TBD`, `TODO`, `implement later`, `...`, `etc.`, `similar to`. Remove every hit.
-3. **Consistency**: Do file paths match between tasks? Do Task 3's imports reference files created in Task 1? Are types and method names consistent across tasks?
-4. **Completeness**: If I were a junior developer with zero context, could I execute every step without asking a single question?
-
-Fix issues inline.
+1. Every requirement maps to at least one task.
+2. No task contains detailed implementation code.
+3. No unresolved placeholder remains.
+4. File paths and interface names are consistent.
+5. Verification commands are concrete.
+6. Confirmation gates from `workflow.md` are respected when present.
 
 ### 8. User Review Gate
 
-Present the plan for approval:
+Present the plan for approval when the workflow or risk level requires it.
 
-> I've written the implementation plan at `.axon/plans/2026-06-05-token-store-plan.md`. It has N tasks covering:
-> - Task 1-2: Core implementation
-> - Task 3: Integration
-> - Task 4: Cleanup
->
-> Interfaces are registered in `.axon/interface-registry.md`. Please review. Once approved, I'll invoke `implement` to execute it.
+Example:
 
-The user must explicitly approve before you proceed to `implement`.
+```text
+I wrote the implementation plan at `.axon/plans/2026-06-08-token-store-plan.md`.
+It has 2 tasks: token persistence and login integration.
+Please review before implementation.
+```
 
-### 9. Update Project Map
+If the user has already authorized direct execution, continue to `execute` or
+`implement` according to task count.
 
-After user approval, update `.axon/project-map.md`:
-- Mark `2. write-plan` as done with the plan doc path
-- List the task stubs under `3. implement`
+### 9. Handoff
 
-### 10. Handoff
+After approval:
 
-After approval, the next skill is `implement` (dispatches one subagent per task). For single-task plans, skip directly to `tdd` — subagent overhead isn't worth it for one task.
+- Use `execute` for one tightly coupled task.
+- Use `implement` for multiple independent tasks.
+- Use `tdd` inside implementation when behavior changes.
+- Use `verify` before any completion claim.
 
 ## Task Granularity
 
-- **Too large**: "Implement the authentication system" — this is a plan, not a task
-- **Too small**: "Create the file" with no code — pedantic
-- **Right**: "Write TokenStore with set/get/delete methods, including tests" — one concrete deliverable
+- Too large: "Implement the authentication system."
+- Too small: "Create the file."
+- Right: "Add TokenStore persistence contract and behavior tests."
 
-If a task name has "and" in it, it's probably two tasks.
+If a task name has "and" in it, it may be two tasks.
 
 ## Key Principles
 
-- **Assume zero context.** The implementer (subagent) has no session history. Every instruction must stand alone.
-- **Copy-paste ready.** Code blocks must compile. Commands must run. Expected output must match reality.
-- **Atomic commits.** One commit per task. If a task produces a broken intermediate state, it's too large.
-- **Tests first.** Every task that produces code starts with a failing test. No exceptions.
-- **DRY in code, not in plans.** Repeating a file path across tasks is fine. Referencing "the file from Task 3" is not.
+- The user's `workflow.md` is the behavior source of truth when present.
+- Plans should be precise but not code-heavy.
+- Interfaces are contracts; implementation is deferred.
+- TDD belongs close to code execution.
+- Verification must be concrete.
+- Avoid hardcoding Axon's lifecycle if the user's workflow defines another one.
 
-## Red Flags — Stop and Fix
+## Red Flags
 
-- You wrote "similar to Task N" instead of repeating the code
-- A task has more than 7 steps
-- You can't write the expected command output because you're not sure it'll work
-- You catch yourself thinking "the implementer will figure out the details"
-- A code block contains `...` or `// etc.`
-- You're not sure what error a test should produce, so you wrote "should fail"
+Stop and revise if:
 
-**All of these mean the plan is incomplete. Fix it before presenting to the user.**
+- A task contains full production code.
+- A task contains a full test file.
+- A task says "the implementer will figure it out."
+- A required decision is unresolved.
+- A verification command is vague.
+- The plan overrides `workflow.md` without user approval.
 
 ## Integration
 
-**Requires**: `brainstorm` (or user-provided spec)
-**Hands off to**: `implement`, or direct `tdd` for single-task plans
+**Requires**: approved design or user-provided spec
+**Hands off to**: `execute`, `implement`, `tdd`, `verify`

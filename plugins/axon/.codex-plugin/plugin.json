@@ -1,7 +1,7 @@
 {
   "name": "axon",
-  "version": "0.1.14",
-  "description": "Lean development methodology: 10 lifecycle skills plus workflow authoring.",
+  "version": "0.1.15",
+  "description": "User-owned workflow layer for Codex with composable skills, hooks, and history.",
   "author": {
     "name": "Axon"
   },
@@ -11,8 +11,8 @@
   "hooks": "./hooks/hooks.json",
   "interface": {
     "displayName": "Axon",
-    "shortDescription": "Lean dev methodology: dream/brainstorm → plan → implement/execute → review → finish",
-    "longDescription": "A focused development methodology plugin. 10 composable lifecycle skills cover dream (greenfield ideation), brainstorm (brownfield design), write-plan (bite-sized tasks), implement (subagent execution with two-stage review), execute (inline single-task execution), tdd (test-first), debug (systematic 4-phase), review (spec compliance + code quality), finish (clean branch completion), and verify (evidence before claims). create-hook adds workflow authoring centered on root-level workflow.md and the .axon workspace.",
+    "shortDescription": "User-owned workflow.md plus composable skills, hooks, and history",
+    "longDescription": "A user-owned workflow layer for Codex. Axon provides composable lifecycle skills, root-level workflow.md support, lightweight runtime hooks, workflow history, and create-hook for project-aware automation. Skills are helpers, not a forced sequence; the user's workflow remains the source of truth.",
     "developerName": "Axon",
     "category": "Developer Tools",
     "capabilities": ["Read", "Write", "Edit", "Bash"]

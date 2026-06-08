@@ -26,14 +26,16 @@ export function buildSkillPrompt(skillName, tasksObj) {
     ? '\n- .axon/tasks.json has been reset to pending; read it and mirror those tasks in the Codex task system.'
     : '';
 
-  return `Axon skill gate: ${skillName} (${mode}).
+  return `Axon skill context: ${skillName} (${mode}).
 
 Before using this skill:
 - Re-check AGENTS.md and relevant docs if the task context is unclear.
-- Use .axon/project-map.md for project orientation.
-- Use .axon/interface-registry.md for public interfaces and contracts.
-- Use .axon/tasks.json for current task progress if it exists.
+- If workflow.md exists, follow its planning, confirmation, verification, and reporting preferences.
+- Use .axon/project-map.md for project orientation if it exists or workflow.md requires it.
+- Use .axon/interface-registry.md for public interfaces if it exists or workflow.md requires it.
+- Use .axon/tasks.json for task progress if it exists.
 - Keep TDD coupled to implementation; default new TDD artifacts to tdd/.${taskNote}
+- Do not force a fixed Axon lifecycle when the user has defined a different workflow.
 - Verify before claiming completion.`;
 }
 

@@ -70,7 +70,7 @@ Treat `workflow.md` as the project's agent behavior design system, not as a gene
 - Workflow Tokens
 - Workflow States
 - Task Classification
-- Default Protocol
+- Example Protocol or project-specific protocol sections
 - Confirmation Gates
 - Tool Policy
 - Output Contract
@@ -85,7 +85,7 @@ Summarize the project workflow in your own notes:
 - Operating philosophy and conflict-resolution principles
 - Workflow tokens that affect autonomy, planning, risk, testing, research, language, or report style
 - Current workflow states and state transitions
-- Task classes and their required protocols
+- Task classes and their configured protocols
 - Confirmation gates and restricted tool behavior
 - Output contracts
 - Current phases and task flow

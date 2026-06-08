@@ -110,7 +110,7 @@ $axon:execute
 $axon:finish
 ```
 
-Typical flow:
+One possible flow:
 
 ```text
 dream / brainstorm -> write-plan -> implement / execute -> review -> finish
@@ -118,8 +118,11 @@ dream / brainstorm -> write-plan -> implement / execute -> review -> finish
                                  v                  v
                                 tdd               debug
                                  |                  |
-                                 +------ verify ----+
+                                +------ verify ----+
 ```
+
+This is an example, not a required Axon pipeline. Project-specific
+`workflow.md` should define the real process.
 
 History layout:
 

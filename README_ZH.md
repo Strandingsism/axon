@@ -110,7 +110,7 @@ $axon:execute
 $axon:finish
 ```
 
-典型流程：
+一种可能的流程：
 
 ```text
 dream / brainstorm -> write-plan -> implement / execute -> review -> finish
@@ -120,6 +120,9 @@ dream / brainstorm -> write-plan -> implement / execute -> review -> finish
                                  |                  |
                                  +------ verify ----+
 ```
+
+这只是示例，不是 Axon 强制管线。项目真实流程应该由项目自己的
+`workflow.md` 定义。
 
 History 结构：
 

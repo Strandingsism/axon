@@ -4,6 +4,14 @@ All notable changes to Axon will be documented in this file.
 
 This project follows a pragmatic version history. Versions refer to the Codex plugin version in `plugins/axon/.codex-plugin/plugin.json`.
 
+## [0.1.15] - 2026-06-08
+
+### Changed
+
+- Changed `write-plan` to produce task contracts instead of detailed implementation code.
+- Clarified that `workflow.md` is user-owned and should not be replaced by a fixed Axon lifecycle.
+- Updated Axon template and hook prompts to treat skills as composable helpers.
+
 ## [0.1.14] - 2026-06-08
 
 ### Fixed
