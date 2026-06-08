@@ -4,6 +4,13 @@ All notable changes to Axon will be documented in this file.
 
 This project follows a pragmatic version history. Versions refer to the Codex plugin version in `plugins/axon/.codex-plugin/plugin.json`.
 
+## [0.1.16] - 2026-06-08
+
+### Fixed
+
+- Removed the `Stop` hook to avoid Stop-event failures in Codex sessions.
+- Close explicit `$axon:finish` history runs during `UserPromptSubmit` and inject the summary prompt there.
+
 ## [0.1.15] - 2026-06-08
 
 ### Changed

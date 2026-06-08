@@ -67,18 +67,6 @@
           }
         ]
       }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"${PLUGIN_ROOT}/hooks/close-prompt-finish-run.mjs\"",
-            "commandWindows": "node \"${PLUGIN_ROOT}/hooks/close-prompt-finish-run.mjs\"",
-            "statusMessage": "Axon: closing explicit finish run"
-          }
-        ]
-      }
     ]
   }
 }

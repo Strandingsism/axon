@@ -181,18 +181,10 @@ export function recordSkillStarted(cwd, skill, eventDetails = {}) {
   return next;
 }
 
-function markPendingFinish(cwd, run, turnId) {
-  const next = {
-    ...run,
-    pendingFinishTurnId: turnId || null,
-  };
-  writeJson(activePath(cwd), next);
-  return next;
-}
-
 export function recordExplicitPromptSkills(cwd, prompt, options = {}) {
   const skills = extractExplicitAxonSkills(prompt);
   let run = null;
+  let finishedRun = null;
 
   for (const skill of skills) {
     run = recordSkillStarted(cwd, skill, {
@@ -201,11 +193,12 @@ export function recordExplicitPromptSkills(cwd, prompt, options = {}) {
     });
 
     if (skill === 'finish') {
-      run = markPendingFinish(cwd, run, options.turnId || null);
+      finishedRun = closeRunForFinish(cwd, 'finish');
+      run = finishedRun;
     }
   }
 
-  return { skills, run };
+  return { skills, run, finishedRun };
 }
 
 export function closeRunForFinish(cwd, skill) {
@@ -214,12 +207,8 @@ export function closeRunForFinish(cwd, skill) {
 
   appendEvent(cwd, run, { event: 'run_finished', skill });
   const finishedAt = appendEvent(cwd, run, { event: 'history_summary_requested', skill });
-  const {
-    pendingFinishTurnId,
-    ...runWithoutPendingFinish
-  } = run;
   const closed = {
-    ...runWithoutPendingFinish,
+    ...run,
     lastEventAt: finishedAt,
     finishedAt,
     status: 'closed',
@@ -234,14 +223,6 @@ export function closeRunForFinish(cwd, skill) {
   });
 
   return { ...closed, summary };
-}
-
-export function closeRunForPendingFinish(cwd, turnId) {
-  const run = readActive(cwd);
-  if (!run || !Object.hasOwn(run, 'pendingFinishTurnId')) return null;
-  if (run.pendingFinishTurnId && turnId && run.pendingFinishTurnId !== turnId) return null;
-
-  return closeRunForFinish(cwd, 'finish');
 }
 
 export function buildHistorySummaryPrompt(run) {
